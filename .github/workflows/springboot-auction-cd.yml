@@ -57,21 +57,12 @@ jobs:
       - name: Deploy to EC2 via SSM
         run: |
           aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --comment "Deploy springboot-auction via SSM" \
-            --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters 'commands=[
-              "docker stop springboot-auction || true",
-              "docker rm springboot-auction || true",
-              "docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/springboot-auction-linux:latest",
-              "docker run -d \\
-                --name springboot-auction \\
-                -p 8080:8080 \\
-                -e SPRING_DATASOURCE_URL=jdbc:mysql://${{ secrets.RDS_ENDPOINT }}:3306/auctiondb \\
-                -e SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }} \\
-                -e SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }} \\
-                -e SPRING_PROFILES_ACTIVE=prod \
-                ${{ secrets.DOCKER_HUB_USERNAME }}/springboot-auction-linux:latest"
-            ]' \
-            --region "${{ secrets.AWS_REGION }}" \
-            --output text
+          --document-name "AWS-RunShellScript" \
+          --comment "Deploy springboot-auction via SSM" \
+          --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
+          --parameters 'commands=[
+            "cd /home/ec2-user/app",
+            "docker compose pull",
+            "docker compose up -d"
+          ]' \
+          --region "${{ secrets.AWS_REGION }}"
