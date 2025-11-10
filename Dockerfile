@@ -1,5 +1,5 @@
 # JDK 21 기반의 OpenJDK 이미지를 사용
-FROM openjdk:21-jdk-slim
+FROM openjdk:21-jdk-slim-bookworm
 # 작업 디렉토리 설정
 WORKDIR /app
 # 빌드된 JAR 파일을 컨테이너에 복사
