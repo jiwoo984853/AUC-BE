@@ -1,4 +1,4 @@
-package com.mutsa.springboot_auction.domain;
+package com.mutsa.springboot_auction.domain.user;
 
 import java.util.Map;
 import lombok.Getter;

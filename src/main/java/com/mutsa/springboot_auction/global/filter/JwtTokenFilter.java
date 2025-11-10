@@ -1,6 +1,6 @@
 package com.mutsa.springboot_auction.global.filter;
 
-import com.mutsa.springboot_auction.entity.User;
+import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.global.repository.UserRepository;
 import com.mutsa.springboot_auction.global.util.JwtUtil;
 import jakarta.servlet.FilterChain;

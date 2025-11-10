@@ -1,4 +1,4 @@
-package com.mutsa.springboot_auction.entity;
+package com.mutsa.springboot_auction.domain.user.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

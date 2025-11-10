@@ -1,8 +1,8 @@
 package com.mutsa.springboot_auction.global.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mutsa.springboot_auction.entity.CustomOAuth2User;
-import com.mutsa.springboot_auction.entity.User;
+import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
+import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.global.util.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

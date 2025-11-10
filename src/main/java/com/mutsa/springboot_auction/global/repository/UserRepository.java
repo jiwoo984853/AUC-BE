@@ -1,7 +1,7 @@
 package com.mutsa.springboot_auction.global.repository;
 
-import com.mutsa.springboot_auction.entity.SocialType;
-import com.mutsa.springboot_auction.entity.User;
+import com.mutsa.springboot_auction.domain.user.entity.SocialType;
+import com.mutsa.springboot_auction.domain.user.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
