@@ -1,4 +1,4 @@
-package com.mutsa.springboot_auction.controller;
+package com.mutsa.springboot_auction.domain.user.controller;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,5 +1,6 @@
 package com.mutsa.springboot_auction.domain.user.entity;
 
+import com.mutsa.springboot_auction.global.common.BaseTimeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,7 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Table(name = "app_users")
-public class User implements UserDetails {
+public class User extends BaseTimeEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

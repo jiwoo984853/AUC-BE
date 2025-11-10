@@ -43,10 +43,10 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:mysql://localhost:3306/test
+    url: jdbc:mysql://localhost:3307/auctiondb
     driver-class-name: com.mysql.cj.jdbc.Driver   # ✅ 여기서만 MySQL 드라이버 선언
-    username: root
-    password: won0862*
+    username: dev
+    password: dev123
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:

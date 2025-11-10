@@ -1,6 +1,8 @@
-package com.mutsa.springboot_auction.domain.chat;
+package com.mutsa.springboot_auction.domain.chat.entity;
 
 
+import com.mutsa.springboot_auction.domain.user.entity.User;
+import com.mutsa.springboot_auction.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "ChatMeseage")
-public class ChatMessage {
+public class ChatMessage extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer messageId;
