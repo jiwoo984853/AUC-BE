@@ -14,22 +14,24 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "ChatRoom")
+@Table(name = "chat_room")
 public class ChatRoom extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long classroomId;
+    @Column(name = "chatroom_id", nullable = false)
+    private Long chatroomId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sellerId")
+    @JoinColumn(name = "seller_id")
     private User seller;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyerId")
+    @JoinColumn(name = "buyer_id")
     private User buyer;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "auctionId", unique = true)
+    @JoinColumn(name = "auction_id", unique = true)
     private Auction auction;
 
     public ChatRoom(User seller, User buyer, Auction auction) {

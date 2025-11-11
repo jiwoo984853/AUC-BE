@@ -72,7 +72,7 @@ public class ChatService {
             new RuntimeException("접근 권한이 없습니다");
         }
 
-        List<ChatMessage> messages = chatMessageRepository.findByChatRoomClassroomIdOrderByCreatedAtAsc(chatRoom.getClassroomId());
+        List<ChatMessage> messages = chatMessageRepository.findByChatRoomChatroomIdOrderByCreatedAtAsc(chatRoom.getChatroomId());
 
         return messages.stream()
                 .map(message -> new MessageResponseDto(

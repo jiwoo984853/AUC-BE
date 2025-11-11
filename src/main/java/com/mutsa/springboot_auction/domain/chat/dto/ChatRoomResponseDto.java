@@ -16,7 +16,7 @@ public class ChatRoomResponseDto {
     private User buyer;
 
     public ChatRoomResponseDto(ChatRoom room) {
-        this.chatRoomId = room.getClassroomId();
+        this.chatRoomId = room.getChatroomId();
         this.auctionId = room.getAuction().getAuctionId();
         this.seller = room.getSeller();
         this.buyer = room.getBuyer();

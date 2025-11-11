@@ -11,11 +11,12 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "AuctioImage")
+@Table(name = "auction_image")
 public class AuctionImage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "auction_image_id", nullable = false)
     private Long id;
 
     private String imageUrl;
