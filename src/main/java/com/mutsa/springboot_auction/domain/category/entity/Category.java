@@ -11,12 +11,15 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "Category")
+@Table(name = "category")
 public class Category extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer categoryId;
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
+
+    @Column(name = "category_name")
     private String categoryName;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)

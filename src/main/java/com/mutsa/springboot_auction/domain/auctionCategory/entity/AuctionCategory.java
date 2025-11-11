@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "AuctionCategory")
+@Table(name = "auction_category")
 public class AuctionCategory extends BaseTimeEntity {
 
     @EmbeddedId
@@ -21,11 +21,11 @@ public class AuctionCategory extends BaseTimeEntity {
 
     @MapsId("categoryId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @MapsId("auctionId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "auctionId")
+    @JoinColumn(name = "auction_id")
     private Auction auction;
 }

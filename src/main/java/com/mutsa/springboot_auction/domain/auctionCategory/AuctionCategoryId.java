@@ -11,6 +11,6 @@ import lombok.*;
 @EqualsAndHashCode
 public class AuctionCategoryId {
     // 복합키 사용을 위한 클래스
-    private Integer auctionId; // FK
-    private Integer categoryId; // FK
+    private Long auctionId; // FK
+    private Long categoryId; // FK
 }
