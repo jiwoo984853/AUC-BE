@@ -16,7 +16,7 @@ public class Category extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer categoryId;
+    private Long categoryId;
     private String categoryName;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)

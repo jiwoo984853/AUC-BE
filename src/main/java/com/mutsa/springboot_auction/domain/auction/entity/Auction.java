@@ -8,6 +8,7 @@ import com.mutsa.springboot_auction.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -20,7 +21,7 @@ import java.util.List;
 public class Auction extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer auctionId;
+    private Long auctionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sellerId", nullable = false)
@@ -38,8 +39,8 @@ public class Auction extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private AuctionStatus status;
 
-    private String startAt;
-    private String endAt;
+    private LocalDateTime startAt;
+    private LocalDateTime endAt;
     private String condition;
     private String incluedItems;
     private String year;
@@ -50,10 +51,6 @@ public class Auction extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AuctionImage> images;
-}
-
-enum AuctionStatus {
-    IN_PROGRESS, SOLD, CANCELLED
 }
 
 

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class ChatRoom extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer classroomId;
+    private Long classroomId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sellerId")
@@ -31,4 +31,10 @@ public class ChatRoom extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auctionId", unique = true)
     private Auction auction;
+
+    public ChatRoom(User seller, User buyer, Auction auction) {
+        this.seller = seller;
+        this.buyer = buyer;
+        this.auction = auction;
+    }
 }
