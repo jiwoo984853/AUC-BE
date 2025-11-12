@@ -31,15 +31,13 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String socialId;
 
     @Column(nullable = false)
-    private Integer point;
+    private Integer point = 0;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
-
-    private Integer point = 0;
 
     public void chargePoint(Integer amount) {
         this.point += amount;
