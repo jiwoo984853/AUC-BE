@@ -3,13 +3,10 @@ package com.mutsa.springboot_auction.domain.chat.controller;
 import com.mutsa.springboot_auction.domain.chat.dto.ChatRoomResponseDto;
 import com.mutsa.springboot_auction.domain.chat.dto.MessageResponseDto;
 import com.mutsa.springboot_auction.domain.chat.service.ChatService;
-import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
 import com.mutsa.springboot_auction.domain.user.entity.User;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,10 +22,9 @@ public class ChatRoomController {
     @PostMapping("/auctions/{auctionId}/chat")
     public ResponseEntity<ChatRoomResponseDto> createOrGetChatRoom(
             @PathVariable Long auctionId,
-            @AuthenticationPrincipal CustomOAuth2User principal
+            @AuthenticationPrincipal(expression = "user") User currentUser
     ) {
-        User currnetUser = principal.getUser();
-        Long currentUserId = currnetUser.getId();
+        Long currentUserId = currentUser.getId();
 
         ChatRoomResponseDto chatRoom = chatService.createOrGetChatRoom(auctionId, currentUserId);
 
@@ -39,9 +35,8 @@ public class ChatRoomController {
     @GetMapping("/chat/rooms/{roomId}/messages")
     public ResponseEntity<List<MessageResponseDto>> getMessages(
             @PathVariable Long roomId,
-            @AuthenticationPrincipal CustomOAuth2User principal
+            @AuthenticationPrincipal(expression = "user") User currentUser
     ) {
-        User currentUser = principal.getUser();
         Long currentUserId = currentUser.getId();
 
         List<MessageResponseDto> messages = chatService.getMessages(roomId, currentUserId);
