@@ -69,7 +69,7 @@ public class ChatService {
 
         // 접근 권한(요청한 userId가 낙찰자 또는 판매자 맞는지 확인)
         if (!chatRoom.getBuyer().getId().equals(userId) && !chatRoom.getSeller().getId().equals(userId)) {
-            new RuntimeException("접근 권한이 없습니다");
+            throw new RuntimeException("접근 권한이 없습니다");
         }
 
         List<ChatMessage> messages = chatMessageRepository.findByChatRoomChatroomIdOrderByCreatedAtAsc(chatRoom.getChatroomId());
@@ -101,7 +101,7 @@ public class ChatService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
 
-        ChatMessage message =ChatMessage.builder()
+        ChatMessage message = ChatMessage.builder()
                 .user(user)
                 .chatRoom(chatRoom)
                 .messageContent(content)

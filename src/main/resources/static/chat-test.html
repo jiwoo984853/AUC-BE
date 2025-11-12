@@ -1,133 +1,368 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <title>채팅 테스트</title>
     <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket 채팅 테스트</title>
     <style>
-        body { font-family: Arial; padding: 20px; }
-        #messages {
-            border: 1px solid #ccc;
-            height: 300px;
-            overflow-y: scroll;
-            padding: 10px;
-            margin: 10px 0;
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
-        .message {
-            padding: 5px;
-            margin: 5px 0;
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .connection-status {
+            padding: 10px;
             border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
         }
-        .my-message {
-            background-color: #dcf8c6;
-            text-align: right;
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
         }
-        .other-message {
-            background-color: #f0f0f0;
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
         }
-        input[type="text"] {
-            width: 70%;
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
             padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
         button {
             padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-connect {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-disconnect {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-send {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-clear {
+            background-color: #6c757d;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .message-box {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;
+            background-color: #fafafa;
+            margin-top: 20px;
+        }
+        .message {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            word-wrap: break-word;
+        }
+        .message-sent {
+            background-color: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+        .message-received {
+            background-color: #f1f8e9;
+            border-left: 3px solid #8bc34a;
+        }
+        .message-system {
+            background-color: #fff3e0;
+            border-left: 3px solid #ff9800;
+            font-style: italic;
+        }
+        .timestamp {
+            font-size: 11px;
+            color: #999;
+            margin-left: 10px;
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+        .info-box code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .config-section {
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+        }
+        .chat-section {
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
         }
     </style>
+    <!-- SockJS 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <!-- STOMP 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
 <body>
-<h1>채팅 테스트</h1>
+<div class="container">
+    <h1>🔌 WebSocket 채팅 테스트</h1>
 
-<div>
-    <label>채팅방 ID: <input type="number" id="roomId" value="1"></label>
-    <label>사용자 ID: <input type="number" id="userId" value="2"></label>
-    <button onclick="connect()">연결</button>
-    <button onclick="disconnect()">연결 끊기</button>
-</div>
+    <div class="info-box">
+        <h3>📋 설정 정보</h3>
+        <p><strong>엔드포인트:</strong> <code>/ws/chat</code></p>
+        <p><strong>발행 경로:</strong> <code>/app/chat/rooms/{roomId}/send</code></p>
+        <p><strong>구독 경로:</strong> <code>/topic/chat/rooms/{roomId}</code></p>
+    </div>
 
-<div id="messages"></div>
+    <div id="status" class="connection-status disconnected">
+        연결 안됨
+    </div>
 
-<div>
-    <input type="text" id="messageInput" placeholder="메시지 입력..."
-           onkeypress="if(event.keyCode==13) sendMessage()">
-    <button onclick="sendMessage()">전송</button>
+    <!-- 연결 설정 섹션 -->
+    <div class="config-section">
+        <h3>🔧 연결 설정</h3>
+
+        <div class="input-group">
+            <label for="serverUrl">서버 URL</label>
+            <input type="text" id="serverUrl" value="http://localhost:8080/ws/chat" placeholder="http://localhost:8080/ws/chat">
+        </div>
+
+        <div class="input-group">
+            <label for="roomId">채팅방 ID</label>
+            <input type="number" id="roomId" value="1" placeholder="채팅방 ID 입력">
+        </div>
+
+        <div class="input-group">
+            <label for="userId">사용자 ID (User ID)</label>
+            <input type="number" id="userId" value="1" placeholder="사용자 ID 입력">
+        </div>
+
+        <div class="input-group">
+            <label for="username">사용자 이름 (표시용)</label>
+            <input type="text" id="username" value="testuser" placeholder="사용자 이름 입력">
+        </div>
+
+        <div>
+            <button class="btn-connect" onclick="connect()">연결</button>
+            <button class="btn-disconnect" onclick="disconnect()" disabled>연결 해제</button>
+        </div>
+    </div>
+
+    <!-- 채팅 섹션 -->
+    <div class="chat-section">
+        <h3>💬 채팅</h3>
+
+        <div class="input-group">
+            <label for="message">메시지</label>
+            <input type="text" id="message" placeholder="메시지 입력" onkeypress="if(event.keyCode==13) sendMessage()">
+        </div>
+
+        <div>
+            <button class="btn-send" onclick="sendMessage()" disabled>전송</button>
+            <button class="btn-clear" onclick="clearMessages()">대화 지우기</button>
+        </div>
+    </div>
+
+    <div class="message-box" id="messageBox"></div>
 </div>
 
 <script>
     let stompClient = null;
-    let roomId = null;
-    let userId = null;
+    let subscription = null;
+
+    function setConnected(connected) {
+        const statusDiv = document.getElementById('status');
+        const connectBtn = document.querySelector('.btn-connect');
+        const disconnectBtn = document.querySelector('.btn-disconnect');
+        const sendBtn = document.querySelector('.btn-send');
+
+        if (connected) {
+            statusDiv.className = 'connection-status connected';
+            statusDiv.textContent = '✅ 연결됨';
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+            sendBtn.disabled = false;
+        } else {
+            statusDiv.className = 'connection-status disconnected';
+            statusDiv.textContent = '❌ 연결 안됨';
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+            sendBtn.disabled = true;
+        }
+    }
 
     function connect() {
-        roomId = document.getElementById('roomId').value;
-        userId = document.getElementById('userId').value;
+        const serverUrl = document.getElementById('serverUrl').value;
+        const roomId = document.getElementById('roomId').value;
+        const userId = document.getElementById('userId').value;
 
-        const socket = new SockJS('http://localhost:8080/ws-chat');
+        if (!roomId) {
+            alert('채팅방 ID를 입력해주세요.');
+            return;
+        }
+
+        if (!userId) {
+            alert('사용자 ID를 입력해주세요.');
+            return;
+        }
+
+        showMessage('시스템', '서버에 연결 중...', 'system');
+
+        const socket = new SockJS(serverUrl);
         stompClient = Stomp.over(socket);
 
+        stompClient.debug = function(str) {
+            console.log('STOMP: ' + str);
+        };
+
         stompClient.connect({}, function(frame) {
+            setConnected(true);
+            showMessage('시스템', '✅ 서버에 연결되었습니다.', 'system');
+            showMessage('시스템', `채팅방 ID: ${roomId}, 사용자 ID: ${userId}`, 'system');
             console.log('Connected: ' + frame);
 
-            // 채팅방 구독
-            stompClient.subscribe('/topic/chat/rooms/' + roomId, function(message) {
-                showMessage(JSON.parse(message.body));
+            const subscribeUrl = '/topic/chat/rooms/' + roomId;
+            showMessage('시스템', '채팅방 구독 중: ' + subscribeUrl, 'system');
+
+            subscription = stompClient.subscribe(subscribeUrl, function(message) {
+                console.log('Received message:', message);
+                const msg = JSON.parse(message.body);
+
+                // 본인 메시지와 타인 메시지 구분
+                const currentUserId = parseInt(document.getElementById('userId').value);
+                const isMyMessage = msg.senderId === currentUserId;
+                const displayName = isMyMessage ?
+                    document.getElementById('username').value + ' (나)' :
+                    (msg.senderName || 'Unknown');
+                const messageType = isMyMessage ? 'sent' : 'received';
+
+                showMessage(displayName, msg.messageContent, messageType);
             });
 
-            addSystemMessage('채팅방에 연결되었습니다.');
+        }, function(error) {
+            setConnected(false);
+            showMessage('시스템', '❌ 연결 실패: ' + error, 'system');
+            console.error('Connection error: ', error);
         });
     }
 
     function disconnect() {
         if (stompClient !== null) {
+            const roomId = document.getElementById('roomId').value;
+            const username = document.getElementById('username').value;
+
+            // 퇴장 메시지 전송
+            const userId = parseInt(document.getElementById('userId').value);
+            const quitMessage = {
+                senderId: userId,
+                messageContent: username + '님이 퇴장하셨습니다.'
+            };
+            const sendUrl = '/app/chat/rooms/' + roomId + '/send';
+            stompClient.send(sendUrl, {}, JSON.stringify(quitMessage));
+
+            if (subscription) {
+                subscription.unsubscribe();
+            }
             stompClient.disconnect();
+            showMessage('시스템', '서버와의 연결이 해제되었습니다.', 'system');
         }
-        addSystemMessage('연결이 끊어졌습니다.');
+        setConnected(false);
     }
 
     function sendMessage() {
-        const messageInput = document.getElementById('messageInput');
-        const content = messageInput.value.trim();
+        const roomId = document.getElementById('roomId').value;
+        const userId = parseInt(document.getElementById('userId').value);
+        const messageContent = document.getElementById('message').value;
 
-        if (content && stompClient) {
-            const chatMessage = {
-                senderId: userId,
-                messageContent: content
-            };
-
-            stompClient.send(
-                '/app/chat/rooms/' + roomId + '/send',
-                {},
-                JSON.stringify(chatMessage)
-            );
-
-            messageInput.value = '';
+        if (!messageContent.trim()) {
+            alert('메시지를 입력해주세요.');
+            return;
         }
+
+        const message = {
+            senderId: userId,
+            messageContent: messageContent
+        };
+
+        const sendUrl = '/app/chat/rooms/' + roomId + '/send';
+        console.log('Sending message:', message, 'to', sendUrl);
+        stompClient.send(sendUrl, {}, JSON.stringify(message));
+
+        document.getElementById('message').value = '';
     }
 
-    function showMessage(message) {
-        const messagesDiv = document.getElementById('messages');
+    function showMessage(sender, message, type) {
+        const messageBox = document.getElementById('messageBox');
         const messageDiv = document.createElement('div');
-        messageDiv.className = 'message ' +
-            (message.senderId == userId ? 'my-message' : 'other-message');
+        const timestamp = new Date().toLocaleTimeString();
 
-        messageDiv.innerHTML = `
-                <strong>${message.senderName}</strong>
-                (${new Date(message.createdAt).toLocaleTimeString()})<br>
-                ${message.messageContent}
-            `;
+        messageDiv.className = 'message message-' + type;
+        messageDiv.innerHTML = `<strong>${sender}</strong><span class="timestamp">${timestamp}</span><br>${message}`;
 
-        messagesDiv.appendChild(messageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        messageBox.appendChild(messageDiv);
+        messageBox.scrollTop = messageBox.scrollHeight;
     }
 
-    function addSystemMessage(text) {
-        const messagesDiv = document.getElementById('messages');
-        const messageDiv = document.createElement('div');
-        messageDiv.style.color = '#666';
-        messageDiv.style.fontStyle = 'italic';
-        messageDiv.textContent = text;
-        messagesDiv.appendChild(messageDiv);
+    function clearMessages() {
+        document.getElementById('messageBox').innerHTML = '';
     }
+
+    // 페이지 로드 시 정보 표시
+    window.onload = function() {
+        showMessage('시스템', '테스트 페이지가 로드되었습니다. 연결 설정 후 연결 버튼을 클릭하세요.', 'system');
+    };
 </script>
 </body>
 </html>
