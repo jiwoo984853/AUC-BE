@@ -1,13 +1,8 @@
 package com.mutsa.springboot_auction.domain.user.entity;
 
 import com.mutsa.springboot_auction.global.common.BaseTimeEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.Collection;
 import java.util.Collections;
 import lombok.AccessLevel;
@@ -35,6 +30,9 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     private String socialId;
 
+    @Column(nullable = false)
+    private Integer point;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -50,6 +48,14 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
+    }
+
+    public void addPoint(Integer amount) {
+        this.point += amount;
+    }
+
+    public void substractPoint(Integer amount) {
+        this.point -= amount;
     }
 
     @Override

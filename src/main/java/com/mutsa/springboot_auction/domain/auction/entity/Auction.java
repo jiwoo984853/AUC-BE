@@ -3,6 +3,7 @@ package com.mutsa.springboot_auction.domain.auction.entity;
 
 import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategory;
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
+import com.mutsa.springboot_auction.domain.bid.entity.Bid;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -66,6 +67,9 @@ public class Auction extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AuctionImage> images;
+
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bid> bids;
 }
 
 

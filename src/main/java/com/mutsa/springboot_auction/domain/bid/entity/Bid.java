@@ -15,31 +15,25 @@ public class Bid extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "bid_id")
     private Long bidId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "auctionId", nullable = false)
+    @JoinColumn(name = "auction_id", nullable = false)
     private Auction auction;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "bid_status")
     private BidStatus status;
 
     @Enumerated(EnumType.STRING)
     private DepositStatus depositStatus;
 
-    private String depositAmount;
-    private Integer basePrice;
+    private Integer depositAmount;
     private Integer bidPrice;
 }
 
-enum BidStatus {
-    PENDING, SUCCESS, FAIELD
-}
-
-enum DepositStatus {
-    HELD, REFUNDED, USED
-}
