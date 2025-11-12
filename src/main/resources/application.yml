@@ -11,6 +11,10 @@ spring:
     hibernate:
       ddl-auto: update   # create-drop 대신 update 추천
     show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB        # ✅ 파일 하나당 최대 10MB
+      max-request-size: 50MB
   security:
     oauth2:
       client:
@@ -28,6 +32,18 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
 
 jwt:
   secret: my-secret-key-study-springboot-psbsbb
