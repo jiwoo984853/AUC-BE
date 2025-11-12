@@ -69,7 +69,8 @@ public class SecurityConfig {
                     "/ws/**",         // WebSocket 엔드포인트
                     "/app/**",             // WebSocket 메시지 발행
                     "/topic/**",      // WebSocket 메시지 구독
-                    "/chat-test.html"
+                    "/chat-test.html",
+                    "/api/points/**"
                 ).permitAll()
 
                 // 나머지 모든 요청은 인증 필요

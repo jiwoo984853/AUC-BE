@@ -15,7 +15,7 @@ public class PointHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer historyId;
+    private Long historyId;
 
     private Integer changeAmount;
 
@@ -25,10 +25,5 @@ public class PointHistory {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
-}
-
-enum HistoryType {
-    // 임의로 타입 이름 만들었으니 수정해서 사용
-    CHARGE, WITHDRAW, BID_DEPOSIT
 }
 
