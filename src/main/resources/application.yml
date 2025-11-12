@@ -41,7 +41,7 @@ jwt:
 spring:
   config:
     activate:
-      on-profile: devv
+      on-profile: dev
   datasource:
     url: jdbc:mysql://localhost:3307/auctiondb
     driver-class-name: com.mysql.cj.jdbc.Driver   # ✅ 여기서만 MySQL 드라이버 선언
