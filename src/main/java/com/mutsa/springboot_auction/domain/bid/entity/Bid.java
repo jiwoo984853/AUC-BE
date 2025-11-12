@@ -37,10 +37,3 @@ public class Bid extends BaseTimeEntity {
     private Integer bidPrice;
 }
 
-enum BidStatus {
-    PENDING, SUCCESS, FAILED
-}
-
-enum DepositStatus {
-    HELD, REFUNDED, USED
-}
