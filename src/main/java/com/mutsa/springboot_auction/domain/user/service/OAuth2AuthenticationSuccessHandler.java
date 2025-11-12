@@ -1,4 +1,4 @@
-package com.mutsa.springboot_auction.global.service;
+package com.mutsa.springboot_auction.domain.user.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
