@@ -63,6 +63,10 @@ public class SecurityConfig {
                     "/h2-console/**",      // H2 데이터베이스 콘솔
                     "/api/auth/**",        // 인증 관련 API
                     "/static/**",
+                    "/css/**",              // ✅ 추가
+                    "/js/**",               // ✅ 추가
+                    "/images/**",           // ✅ 추가
+                    "/*.html",
                     "/ws/**",         // WebSocket 엔드포인트
                     "/app/**",             // WebSocket 메시지 발행
                     "/topic/**",      // WebSocket 메시지 구독
