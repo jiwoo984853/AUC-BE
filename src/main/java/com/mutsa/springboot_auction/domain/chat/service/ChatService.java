@@ -11,7 +11,7 @@ import com.mutsa.springboot_auction.domain.chat.entity.ChatRoom;
 import com.mutsa.springboot_auction.domain.chat.repository.ChatMessageRepository;
 import com.mutsa.springboot_auction.domain.chat.repository.ChatRoomRepository;
 import com.mutsa.springboot_auction.domain.user.entity.User;
-import com.mutsa.springboot_auction.global.repository.UserRepository;
+import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

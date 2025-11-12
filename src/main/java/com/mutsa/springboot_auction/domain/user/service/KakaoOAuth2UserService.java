@@ -1,11 +1,11 @@
-package com.mutsa.springboot_auction.global.service;
+package com.mutsa.springboot_auction.domain.user.service;
 
 import com.mutsa.springboot_auction.domain.user.KakaoUserInfo;
 import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
 import com.mutsa.springboot_auction.domain.user.entity.Role;
 import com.mutsa.springboot_auction.domain.user.entity.SocialType;
 import com.mutsa.springboot_auction.domain.user.entity.User;
-import com.mutsa.springboot_auction.global.repository.UserRepository;
+import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

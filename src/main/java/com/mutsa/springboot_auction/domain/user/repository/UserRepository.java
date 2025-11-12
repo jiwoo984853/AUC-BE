@@ -1,4 +1,4 @@
-package com.mutsa.springboot_auction.global.repository;
+package com.mutsa.springboot_auction.domain.user.repository;
 
 import com.mutsa.springboot_auction.domain.user.entity.SocialType;
 import com.mutsa.springboot_auction.domain.user.entity.User;

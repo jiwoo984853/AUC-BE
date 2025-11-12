@@ -3,7 +3,7 @@ package com.mutsa.springboot_auction.domain.pointHistory.service;
 import com.mutsa.springboot_auction.domain.pointHistory.entity.PointHistory;
 import com.mutsa.springboot_auction.domain.pointHistory.repository.PointHistoryRepository;
 import com.mutsa.springboot_auction.domain.user.entity.User;
-import com.mutsa.springboot_auction.global.repository.UserRepository;
+import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

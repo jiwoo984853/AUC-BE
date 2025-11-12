@@ -1,8 +1,8 @@
 package com.mutsa.springboot_auction.global.config;
 
 import com.mutsa.springboot_auction.global.filter.JwtTokenFilter;
-import com.mutsa.springboot_auction.global.service.KakaoOAuth2UserService;
-import com.mutsa.springboot_auction.global.service.OAuth2AuthenticationSuccessHandler;
+import com.mutsa.springboot_auction.domain.user.service.KakaoOAuth2UserService;
+import com.mutsa.springboot_auction.domain.user.service.OAuth2AuthenticationSuccessHandler;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
