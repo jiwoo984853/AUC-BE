@@ -66,7 +66,7 @@ public class SecurityConfig {
                     "/css/**",              // ✅ 추가
                     "/js/**",               // ✅ 추가
                     "/images/**",           // ✅ 추가
-                    "/*.html",
+                    "/**/*.html",
                     "/ws/**",         // WebSocket 엔드포인트
                     "/app/**",             // WebSocket 메시지 발행
                     "/topic/**",      // WebSocket 메시지 구독
