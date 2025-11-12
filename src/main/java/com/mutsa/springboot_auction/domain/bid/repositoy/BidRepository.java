@@ -7,7 +7,6 @@ import com.mutsa.springboot_auction.domain.user.entity.User;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
@@ -16,9 +15,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     Optional<Bid> findTopByAuctionOrderByBidPriceDesc(Auction auction);
 
-    @Lock(LockModeType.PESSIMISTIC_READ)
-    @Query("select b from Bid b where  b.auction = :auction order by b.bidPrice desc limit 1")
-    Optional<Bid> findTopByAuctionForUpdate(@Param("auction")Auction auction);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<Bid> findFirstByAuctionOrderByBidPriceDesc(@Param("auction")Auction auction);
 
     long countByAuctionAndUserAndStatus(Auction auction, User user, BidStatus status);
 }
