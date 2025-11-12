@@ -41,7 +41,7 @@ jwt:
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: devv
   datasource:
     url: jdbc:mysql://localhost:3307/auctiondb
     driver-class-name: com.mysql.cj.jdbc.Driver   # ✅ 여기서만 MySQL 드라이버 선언
@@ -52,6 +52,10 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB        # ✅ 파일 하나당 최대 10MB
+      max-request-size: 50MB     # ✅ 전체 요청 최대 50MB
   security:
     oauth2:
       client:
@@ -69,6 +73,18 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
 
 logging:
   level:
@@ -87,6 +103,10 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
+  servlet:
+    multipart:
+      max-file-size: 10MB        # ✅ 파일 하나당 최대 10MB
+      max-request-size: 50MB     # ✅ 전체 요청 최대 50MB
   security:
     oauth2:
       client:
@@ -104,3 +124,15 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

@@ -70,7 +70,8 @@ public class SecurityConfig {
                     "/app/**",             // WebSocket 메시지 발행
                     "/topic/**",      // WebSocket 메시지 구독
                     "/chat-test.html",
-                    "/api/points/**"
+                    "/api/points/**",
+                    "/api/s3/test/upload"
                 ).permitAll()
 
                 // 나머지 모든 요청은 인증 필요
