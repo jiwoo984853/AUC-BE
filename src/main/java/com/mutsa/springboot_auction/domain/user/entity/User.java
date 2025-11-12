@@ -39,6 +39,12 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
+    private Integer point = 0;
+
+    public void chargePoint(Integer amount) {
+        this.point += amount;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));

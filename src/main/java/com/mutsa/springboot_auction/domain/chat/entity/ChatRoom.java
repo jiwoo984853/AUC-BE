@@ -20,7 +20,7 @@ public class ChatRoom extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "chatroom_id", nullable = false)
-    private Long chatroomId;
+    private Long chatroomId;  // 필드명은 그대로 유지
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id")

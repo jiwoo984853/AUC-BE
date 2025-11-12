@@ -1,8 +1,8 @@
 package com.mutsa.springboot_auction.global.config;
 
 import com.mutsa.springboot_auction.global.filter.JwtTokenFilter;
-import com.mutsa.springboot_auction.global.service.KakaoOAuth2UserService;
-import com.mutsa.springboot_auction.global.service.OAuth2AuthenticationSuccessHandler;
+import com.mutsa.springboot_auction.domain.user.service.KakaoOAuth2UserService;
+import com.mutsa.springboot_auction.domain.user.service.OAuth2AuthenticationSuccessHandler;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -61,13 +61,23 @@ public class SecurityConfig {
                     "/login/**",            // 로그인 관련
                     "/oauth2/**",          // OAuth2 관련
                     "/h2-console/**",      // H2 데이터베이스 콘솔
-                    "/api/auth/**",   // 인증 관련 API
-                    "/static/**"
+                    "/api/auth/**",        // 인증 관련 API
+                    "/static/**",           // 스태틱
+                    "/css/**",              // ✅ 추가
+                    "/js/**",               // ✅ 추가
+                    "/images/**",           // ✅ 추가
+                    "/ws/**",         // WebSocket 엔드포인트
+                    "/app/**",             // WebSocket 메시지 발행
+                    "/topic/**",      // WebSocket 메시지 구독
+                    "/chat-test.html",
+                    "/api/points/**",
+                    "/api/s3/test/upload"
                 ).permitAll()
 
                 // 나머지 모든 요청은 인증 필요
                 .anyRequest().authenticated()
             )
+
 
             // === OAuth2 로그인 설정 ===
             .oauth2Login(oauth2 -> oauth2

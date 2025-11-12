@@ -11,7 +11,7 @@ import com.mutsa.springboot_auction.domain.chat.entity.ChatRoom;
 import com.mutsa.springboot_auction.domain.chat.repository.ChatMessageRepository;
 import com.mutsa.springboot_auction.domain.chat.repository.ChatRoomRepository;
 import com.mutsa.springboot_auction.domain.user.entity.User;
-import com.mutsa.springboot_auction.global.repository.UserRepository;
+import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +69,7 @@ public class ChatService {
 
         // 접근 권한(요청한 userId가 낙찰자 또는 판매자 맞는지 확인)
         if (!chatRoom.getBuyer().getId().equals(userId) && !chatRoom.getSeller().getId().equals(userId)) {
-            new RuntimeException("접근 권한이 없습니다");
+            throw new RuntimeException("접근 권한이 없습니다");
         }
 
         List<ChatMessage> messages = chatMessageRepository.findByChatRoomChatroomIdOrderByCreatedAtAsc(chatRoom.getChatroomId());
@@ -101,7 +101,7 @@ public class ChatService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
 
-        ChatMessage message =ChatMessage.builder()
+        ChatMessage message = ChatMessage.builder()
                 .user(user)
                 .chatRoom(chatRoom)
                 .messageContent(content)

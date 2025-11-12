@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
-    List<ChatMessage> findByChatRoomChatroomIdOrderByCreatedAtAsc(Long chatRoomId);
+    // 메서드명을 chatRoom.chatroomId로 정확히 매칭
+    List<ChatMessage> findByChatRoomChatroomIdOrderByCreatedAtAsc(Long chatroomId);
 }
