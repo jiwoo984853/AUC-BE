@@ -28,7 +28,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         // permitAll 경로는 필터 건너뛰기
         return path.startsWith("/api/points/") ||
                 path.startsWith("/api/s3/") ||
-                path.startsWith("/ws/") ||
+                path.contains("/ws/") ||
                 path.startsWith("/api/auth/") ||
                 path.equals("/") ||
                 path.startsWith("/login") ||
