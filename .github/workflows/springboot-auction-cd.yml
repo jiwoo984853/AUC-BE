@@ -69,3 +69,4 @@ jobs:
             "docker-compose up -d"
           ]' \
           --region "${{ secrets.AWS_REGION }}"
+
