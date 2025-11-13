@@ -33,9 +33,13 @@ services:
     ports:
       - "8080:8080"
     environment:
+      - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-auction.cjgqoaggg3c5.ap-northeast-2.rds.amazonaws.com:3306/auctiondb
       - SPRING_DATASOURCE_USERNAME=dev
       - SPRING_DATASOURCE_PASSWORD=dev123
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}  # ← .env 파일에서
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
     networks:
       - auction-network
 
