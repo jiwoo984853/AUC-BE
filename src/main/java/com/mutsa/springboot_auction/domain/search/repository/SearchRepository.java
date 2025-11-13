@@ -23,4 +23,8 @@ public interface SearchRepository extends JpaRepository<Auction, Long> {
             @Param("categoryId") Long categoryId,
             @Param("keyword") String keyword
     );
+
+    @Query("select a from Auction a " +
+            "where a.goodsName like %:keyword%")
+    public List<Auction> searchAllAuctions(@Param("keyword") String keyword);
 }

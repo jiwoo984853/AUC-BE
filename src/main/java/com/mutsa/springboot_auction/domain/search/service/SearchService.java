@@ -37,6 +37,14 @@ public class SearchService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<SearchResponse> searchAllAuctions(String keyword) {
+        List<Auction> auctions = searchRepository.searchAllAuctions(keyword);
+        return auctions.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
     private SearchResponse convertToResponse(Auction auction) {
         String imageUrl = (auction.getImages() != null && !auction.getImages().isEmpty())
                 ? auction.getImages().get(0).getImageUrl()

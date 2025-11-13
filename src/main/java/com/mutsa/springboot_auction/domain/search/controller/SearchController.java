@@ -28,4 +28,10 @@ public class SearchController {
         List<SearchResponse> auctions = searchService.searchAuctionsInCategory(categoryId, keyword);
         return ResponseEntity.ok(auctions);
     }
+
+    @GetMapping("/keyword")
+    public ResponseEntity<List<SearchResponse>> getAllAuctions(@RequestParam String keyword) {
+        List<SearchResponse> auctions = searchService.searchAllAuctions(keyword);
+        return ResponseEntity.ok(auctions);
+    }
 }
