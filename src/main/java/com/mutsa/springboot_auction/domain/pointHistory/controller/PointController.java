@@ -36,7 +36,7 @@ public class PointController {
         return pointService.getHistory(user);
     }
 
-    /**
+
     // 포인트 충전 (테스트용)
     @PostMapping("/charge/test")
     public void chargePoint(@RequestBody Map<String, Integer> request) {
@@ -49,7 +49,6 @@ public class PointController {
         pointService.chargePoint(user, amount);
     }
 
-    // 포인트 내역 조회 (테스트용)
     @GetMapping("/history/test")
     public List<PointHistory> getHistory(@RequestParam Long userId) {
         User user = userRepository.findById(userId)
@@ -57,5 +56,5 @@ public class PointController {
 
         return pointService.getHistory(user);
     }
-    **/
+
 }
