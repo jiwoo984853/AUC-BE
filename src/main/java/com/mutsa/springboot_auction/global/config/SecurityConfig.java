@@ -57,21 +57,22 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // 인증 없이 접근 가능한 경로들
                 .requestMatchers(
-                    "/",                    // 메인 페이지
-                    "/login/**",            // 로그인 관련
-                    "/oauth2/**",          // OAuth2 관련
-                    "/h2-console/**",      // H2 데이터베이스 콘솔
-                    "/api/auth/**",        // 인증 관련 API
-                    "/static/**",           // 스태틱
-                    "/css/**",              // ✅ 추가
-                    "/js/**",               // ✅ 추가
-                    "/images/**",           // ✅ 추가
-                    "/ws/**",         // WebSocket 엔드포인트
-                    "/app/**",             // WebSocket 메시지 발행
-                    "/topic/**",      // WebSocket 메시지 구독
-                    "/chat-test.html",
-                    "/api/points/**",
-                    "/api/s3/test/upload"
+                        "/",
+                        "/login/**",
+                        "/oauth2/**",
+                        "/h2-console/**",
+                        "/api/auth/**",
+                        "/api/points/**",
+                        "/api/s3/**",          // ← 패턴 변경
+                        "/static/**",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/ws/**",              // WebSocket 엔드포인트
+                        "/app/**",             // STOMP 메시지 발행
+                        "/topic/**",           // STOMP 구독
+                        "/queue/**",           // ← 추가 (개인 메시지용)
+                        "/chat-test.html"
                 ).permitAll()
 
                 // 나머지 모든 요청은 인증 필요
