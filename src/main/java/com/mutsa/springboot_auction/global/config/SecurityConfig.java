@@ -4,6 +4,8 @@ import com.mutsa.springboot_auction.global.filter.JwtTokenFilter;
 import com.mutsa.springboot_auction.domain.user.service.KakaoOAuth2UserService;
 import com.mutsa.springboot_auction.domain.user.service.OAuth2AuthenticationSuccessHandler;
 import java.util.Arrays;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -93,7 +95,19 @@ public class SecurityConfig {
                 // OAuth2 로그인 성공 시 처리 핸들러
                 .successHandler(oAuth2AuthenticationSuccessHandler)
             )
+            .exceptionHandling(exception -> exception
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        String requestURI = request.getRequestURI();
 
+                        // permitAll 경로는 401 반환
+                        if (requestURI.startsWith("/api/")) {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        } else {
+                            // 그 외는 로그인 페이지로
+                            response.sendRedirect("/login");
+                        }
+                    })
+            )
             // === 커스텀 필터 추가 ===
             // JWT 인증 필터를 Spring Security 필터 체인에 추가
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
