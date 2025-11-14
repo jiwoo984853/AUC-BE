@@ -18,9 +18,13 @@ public interface SearchRepository extends JpaRepository<Auction, Long> {
 
     @Query("select a from Auction a " +
             "join a.categories ac " +
-            "where ac.id.categoryId = :categoryId and a.goodsName like %:keyword%")
+            "where ac.id.categoryId = :categoryId and replace(a.goodsName, ' ', '') like %:keyword%")
     public List<Auction> searchInCategory(
             @Param("categoryId") Long categoryId,
             @Param("keyword") String keyword
     );
+
+    @Query("select a from Auction a " +
+            "where replace(a.goodsName, ' ', '') like %:keyword%")
+    public List<Auction> searchAllAuctions(@Param("keyword") String keyword);
 }
