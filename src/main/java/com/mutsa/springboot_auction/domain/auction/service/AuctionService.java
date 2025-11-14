@@ -17,6 +17,6 @@ public class AuctionService {
         Auction auction = Auction.of(auctionRequest, seller);
         //저장
         Auction savedAuction = auctionRepository.save(auction);
-        return savedAuction.getId();
+        return savedAuction.getAuctionId();
     }
 }

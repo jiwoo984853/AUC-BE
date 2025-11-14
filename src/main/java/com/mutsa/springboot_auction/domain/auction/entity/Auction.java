@@ -18,36 +18,70 @@ import java.util.List;
 @Table(name = "auction")
 @Getter
 public class Auction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToOne
-    @JoinColumn(name = "seller_id")
+    @Column(name = "auction_id", nullable = false)  // 명시적으로 추가
+    private Long auctionId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
-    private String itemName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User winner;
+
+    @Column(name = "goods_name")
+    private String goodsName;
+
     private String description;
+
+    @Column(name = "start_price")
     private Integer startPrice;
+
+    @Column(name = "current_price")
+    private Integer currentPrice;
+
     @Enumerated(EnumType.STRING)
     private AuctionStatus status;
-    private LocalDateTime startAt;
-    private LocalDateTime endAt;
-
-    private String condition;
 
     @Enumerated(EnumType.STRING)
     private TransactionMethod transactionMethod;
+
+    @Column(name = "start_at")
+    private LocalDateTime startAt;
+
+    @Column(name = "end_at")
+    private LocalDateTime endAt;
+
+    @Column(name = "item_condition")
+    private String condition;
+
+    @Column(name = "included_items")
+    private String includedItems;
+
     private String manufactureYear;
     private String location;
 
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL)
+    private List<AuctionCategory> categories;
+
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AuctionImage> images;
+
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bid> bids;
+
     private Boolean hideBidPrice;
 
-    public Auction(User seller, String itemName, String description,
+    public Auction(User seller, String goodsName, String description,
                    Integer startPrice, AuctionStatus status,
                    LocalDateTime startAt, LocalDateTime endAt,
                    String condition, TransactionMethod transactionMethod, String manufactureYear, String location,
                    Boolean hideBidPrice) {
         this.seller = seller;
-        this.itemName = itemName;
+        this.goodsName = goodsName;
         this.description = description;
         this.startPrice = startPrice;
         this.status = status;
