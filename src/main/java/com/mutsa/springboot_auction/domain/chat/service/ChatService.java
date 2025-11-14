@@ -56,7 +56,11 @@ public class ChatService {
 
         ChatRoom chatRoom = chatRoomRepository.findByAuctionAuctionId(auctionId)
                 .orElseGet(() -> {
-                    ChatRoom newRoom = new ChatRoom(seller, winner, auction);
+                    ChatRoom newRoom = ChatRoom.builder()
+                            .seller(seller)
+                            .buyer(winner)
+                            .auction(auction)
+                            .build();
                     return chatRoomRepository.save(newRoom);
                 });
 

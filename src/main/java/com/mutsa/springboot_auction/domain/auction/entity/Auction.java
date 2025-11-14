@@ -65,6 +65,7 @@ public class Auction extends BaseTimeEntity {
     // 결제 완료하면 COMPLETED로 바뀜
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
+    @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL)
