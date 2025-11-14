@@ -99,15 +99,7 @@ public class SecurityConfig {
             )
             .exceptionHandling(exception -> exception
                     .authenticationEntryPoint((request, response, authException) -> {
-                        String requestURI = request.getRequestURI();
-
-                        // permitAll 경로는 401 반환
-                        if (requestURI.startsWith("/api/")) {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                        } else {
-                            // 그 외는 로그인 페이지로
-                            response.sendRedirect("/login");
-                        }
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                     })
             )
             // === 커스텀 필터 추가 ===
