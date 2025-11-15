@@ -76,6 +76,7 @@ public class SecurityConfig {
                         "/queue/**",           // ← 추가 (개인 메시지용)
                         "/chat-test.html",
                         "/api/search/**",
+                        "/api/chat/rooms/*/complete/test",
                         "/api/notification/**"
                 ).permitAll()
 
