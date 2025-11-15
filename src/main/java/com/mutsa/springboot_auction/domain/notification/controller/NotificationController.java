@@ -1,5 +1,6 @@
 package com.mutsa.springboot_auction.domain.notification.controller;
 
+import com.mutsa.springboot_auction.domain.notification.dto.NotificationResponse;
 import com.mutsa.springboot_auction.domain.notification.service.NotificationService;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,11 +32,11 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getUnreadCount(userId));
     }
 
-    @PatchMapping("/read-all")
-    public ResponseEntity<Void> markAllAsRead(
-            @AuthenticationPrincipal(expression = "user") User user) {
-        notificationService.markAllAsRead(user.getId());
-        return ResponseEntity.ok().build();
+    @GetMapping("/list")
+    public ResponseEntity<List<NotificationResponse>> getNotificationList(
+            @AuthenticationPrincipal(expression = "user") User user
+    ) {
+        return ResponseEntity.ok(notificationService.getNotificationList(user.getId()));
     }
 
     @GetMapping("/unread-count/test")
@@ -42,10 +45,12 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getUnreadCount(userId));
     }
 
-    @PatchMapping("/read-all/test")
-    public ResponseEntity<Void> markAllAsReadTest(
-            @RequestParam Long userId) {
-        notificationService.markAllAsRead(userId);
-        return ResponseEntity.ok().build();
+    @GetMapping("/list/test")
+    public ResponseEntity<List<NotificationResponse>> getNotificationList(
+            @RequestParam Long userId
+    ) {
+        return ResponseEntity.ok(notificationService.getNotificationList(userId));
     }
+
+
 }
