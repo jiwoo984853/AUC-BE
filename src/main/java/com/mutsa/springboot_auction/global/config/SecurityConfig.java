@@ -75,7 +75,8 @@ public class SecurityConfig {
                         "/topic/**",           // STOMP 구독
                         "/queue/**",           // ← 추가 (개인 메시지용)
                         "/chat-test.html",
-                        "/api/search/**"
+                        "/api/search/**",
+                        "/api/notification/**"
                 ).permitAll()
 
                 // 나머지 모든 요청은 인증 필요
