@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BidRepository extends JpaRepository<Bid, Long> {
@@ -19,4 +20,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     Optional<Bid> findFirstByAuctionOrderByBidPriceDesc(@Param("auction")Auction auction);
 
     long countByAuctionAndUserAndStatus(Auction auction, User user, BidStatus status);
+
+    List<Bid> findAllByAuctionOrderByCreatedAtDesc(Auction auction);
 }
