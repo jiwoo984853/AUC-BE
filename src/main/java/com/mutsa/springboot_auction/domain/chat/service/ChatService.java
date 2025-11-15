@@ -2,6 +2,7 @@ package com.mutsa.springboot_auction.domain.chat.service;
 
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
+import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.chat.dto.ChatMessageDto;
 import com.mutsa.springboot_auction.domain.chat.dto.ChatRoomResponseDto;
@@ -10,6 +11,9 @@ import com.mutsa.springboot_auction.domain.chat.entity.ChatMessage;
 import com.mutsa.springboot_auction.domain.chat.entity.ChatRoom;
 import com.mutsa.springboot_auction.domain.chat.repository.ChatMessageRepository;
 import com.mutsa.springboot_auction.domain.chat.repository.ChatRoomRepository;
+import com.mutsa.springboot_auction.domain.pointHistory.entity.HistoryType;
+import com.mutsa.springboot_auction.domain.pointHistory.entity.PointHistory;
+import com.mutsa.springboot_auction.domain.pointHistory.repository.PointHistoryRepository;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,7 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
+    private final PointHistoryRepository pointHistoryRepository;
 
 
     /**
@@ -51,7 +56,11 @@ public class ChatService {
 
         ChatRoom chatRoom = chatRoomRepository.findByAuctionAuctionId(auctionId)
                 .orElseGet(() -> {
-                    ChatRoom newRoom = new ChatRoom(seller, winner, auction);
+                    ChatRoom newRoom = ChatRoom.builder()
+                            .seller(seller)
+                            .buyer(winner)
+                            .auction(auction)
+                            .build();
                     return chatRoomRepository.save(newRoom);
                 });
 
@@ -110,5 +119,53 @@ public class ChatService {
         ChatMessage savedMessage = chatMessageRepository.save(message);
 
         return new ChatMessageDto(savedMessage);
+    }
+
+    // roomId, userId를 받아서 낙찰자가 판매자에게 포인트 송금하는 메서드
+    @Transactional
+    public void completeTransaction(Long roomId, Long userId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다"));
+
+        Auction auction = chatRoom.getAuction();
+
+        if (auction.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            throw new RuntimeException("이미 거래가 완료되었습니다");
+        }
+
+        if (!chatRoom.getBuyer().getId().equals(userId)) {
+            throw new RuntimeException("거래 완료 권한이 없습니다");
+        }
+
+        User seller = chatRoom.getSeller();
+        User buyer = chatRoom.getBuyer();
+        Integer finalPrice = auction.getCurrentPrice();
+
+        Integer remainingPrice = (int) (finalPrice * 0.9);
+
+        if (buyer.getPoint() < remainingPrice) {
+            throw new RuntimeException("포인트가 부족합니다");
+        }
+
+        buyer.subtractPoint(remainingPrice);
+        seller.addPoint(finalPrice);
+
+        PointHistory buyerHistory = PointHistory.builder()
+                .user(buyer)
+                .type(HistoryType.PURCHASE)
+                .changeAmount(-remainingPrice)
+                .build();
+
+        pointHistoryRepository.save(buyerHistory);
+
+        PointHistory sellerHistory = PointHistory.builder()
+                .user(seller)
+                .type(HistoryType.SALE)
+                .changeAmount(finalPrice)
+                .build();
+
+        pointHistoryRepository.save(sellerHistory);
+
+        auction.setPaymentStatus(PaymentStatus.COMPLETED);
     }
 }

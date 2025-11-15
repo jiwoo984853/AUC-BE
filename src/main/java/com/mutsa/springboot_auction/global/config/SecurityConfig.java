@@ -77,6 +77,7 @@ public class SecurityConfig {
                         "/chat-test.html",
                         "/api/search/**",
                         "/api/notification/**"
+                        "/api/chat/rooms/*/complete/test"
                 ).permitAll()
 
                 // 나머지 모든 요청은 인증 필요
