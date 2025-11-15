@@ -1,5 +1,6 @@
 package com.mutsa.springboot_auction.domain.notification.service;
 
+import com.mutsa.springboot_auction.domain.notification.dto.NotificationResponse;
 import com.mutsa.springboot_auction.domain.notification.entity.Notification;
 import com.mutsa.springboot_auction.domain.notification.entity.NotificationType;
 import com.mutsa.springboot_auction.domain.notification.repository.NotificationRepository;
@@ -93,6 +94,20 @@ public class NotificationService {
                 emitters.remove(userId);
             }
         }
+    }
+
+    @Transactional
+    public List<NotificationResponse> getNotificationList(Long userId) {
+        List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+
+        // 객체의 상태를 수정할때는 forEach를 쓰고, 객체를 변환(엔티티 -> dto)할떄는 map 사용
+        notifications.stream()
+                .filter(n -> !n.isRead())
+                .forEach(n -> n.setRead(true));
+
+        return notifications.stream()
+                .map(NotificationResponse::from)
+                .toList();
     }
 
     public int getUnreadCount(Long userId) {
