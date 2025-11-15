@@ -120,21 +120,19 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 허용할 도메인 설정 (개발환경)
+        // ✅ 배포 도메인 추가
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",    // React 개발 서버
-            "http://localhost:8080"     // 같은 서버
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "https://mmuuttssaa.shop",      // ✅ 추가
+                "http://mmuuttssaa.shop"        // ✅ 추가
         ));
 
-        // 허용할 HTTP 메서드
         configuration.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
 
-        // 허용할 헤더
         configuration.setAllowedHeaders(Arrays.asList("*"));
-
-        // 인증 정보 포함 허용 (쿠키, Authorization 헤더 등)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
