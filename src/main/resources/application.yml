@@ -2,6 +2,10 @@
 # default (local/test) 환경 → H2 사용
 # ===============================
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL   # ✅ MySQL 호환 모드
     username: sa
@@ -49,6 +53,7 @@ jwt:
   secret: my-secret-key-study-springboot-psbsbb
   access-token-expiration: 3600000    # 1시간
   refresh-token-expiration: 1209600000
+
 
 ---
 # ===============================
