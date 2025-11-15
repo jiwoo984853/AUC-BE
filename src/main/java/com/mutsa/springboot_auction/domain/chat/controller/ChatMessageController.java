@@ -17,7 +17,7 @@ public class ChatMessageController {
 
     /**
      * 메시지 전송
-     * 클라이언트: /app/chat/rooms/{roomId}/send로 전송(pub)
+     * 클라이언트: /app/chat/rooms/{roomId}/send로 서버로 전송(pub)
      * 서버: /topic/chat/rooms/{roomId}로 브로드캐스트
      */
     @MessageMapping("/chat/rooms/{roomId}/send")

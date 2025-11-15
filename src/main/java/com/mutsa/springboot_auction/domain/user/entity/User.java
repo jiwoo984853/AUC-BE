@@ -52,7 +52,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.point += amount;
     }
 
-    public void substractPoint(Integer amount) {
+    public void subtractPoint(Integer amount) {
         this.point -= amount;
     }
 
