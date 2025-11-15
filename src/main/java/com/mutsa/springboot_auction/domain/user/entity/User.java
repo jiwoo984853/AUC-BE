@@ -31,6 +31,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String socialId;
 
     @Column(nullable = false)
+    @Builder.Default
     private Integer point = 0;
 
     @Enumerated(EnumType.STRING)
