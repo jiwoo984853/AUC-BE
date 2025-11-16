@@ -33,13 +33,13 @@ public class AuctionController {
         return ResponseEntity.ok(auctionService.post(user, auctionRequest));
     }
 
-    @GetMapping("auctions/deck")
-    public DeckResponse getDeck(
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User, // 너 프로젝트의 유저 디테일 타입
+    @GetMapping("/auctions/deck")
+    public ResponseEntity<DeckResponse> getDeck(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @RequestParam(defaultValue = "10") int size
     ) {
         Long userId = customOAuth2User.getUser().getId();
-        List<AuctionDto> items = deckService.getDeck(userId, size);
-        return DeckResponse.of(items);
+        List<AuctionSimpleResponse> items = deckService.getDeck(userId, size);
+        return ResponseEntity.ok(DeckResponse.of(items));
     }
 }
