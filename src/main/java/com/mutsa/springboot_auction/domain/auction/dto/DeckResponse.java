@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeckResponse {
-    List<AuctionDto> auctions;
+    List<AuctionSimpleResponse> auctions;
 
-    public static DeckResponse of(List<AuctionDto> auctionDtos) {
-        return new DeckResponse(auctionDtos);
+    public static DeckResponse of(List<AuctionSimpleResponse> auctionSimpleResponses) {
+        return new DeckResponse(auctionSimpleResponses);
     }
 }
