@@ -19,8 +19,27 @@ public class SwipeActionService {
         switch(action.toUpperCase()) {
             case "DISLIKE" -> handleDisLike(userId, auctionId);
             case "HOLD" -> handleHold(userId, auctionId);
+            case "BIDDING" -> handleBidding(userId, auctionId);
             default -> throw new IllegalArgumentException("Invalid action:" + action);
         }
+    }
+
+    private void handleBidding(Long userId, Long auctionId) {
+        String dislikeKey = RedisKey.dislikeKey(userId); //재노출 방지
+        String deckKey = RedisKey.deckKey(userId);
+
+        String idStr = String.valueOf(auctionId);
+
+
+        redisTemplate.opsForSet().add(dislikeKey, String.valueOf(auctionId));
+
+        redisTemplate.opsForList().remove(deckKey, 0, idStr);
+
+
+        UserAuctionState state = getOrCreate(userId, auctionId);
+        state.setState(ItemState.BIDDING);
+        state.setLastActionAt(LocalDateTime.now());
+        userAuctionStateRepository.save(state);
     }
 
     private void handleDisLike(Long userId, Long auctionId) {
