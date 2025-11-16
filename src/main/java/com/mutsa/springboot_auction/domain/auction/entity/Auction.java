@@ -43,7 +43,7 @@ public class Auction {
     private Integer currentPrice;
 
     @Enumerated(EnumType.STRING)
-    private AuctionState state;
+    private AuctionStatus status;
 
     @Enumerated(EnumType.STRING)
     private TransactionMethod transactionMethod;
@@ -75,7 +75,7 @@ public class Auction {
     private Boolean hideBidPrice;
 
     public Auction(User seller, String goodsName, String description,
-                   Integer startPrice, AuctionState state,
+                   Integer startPrice, AuctionStatus status,
                    LocalDateTime startAt, LocalDateTime endAt,
                    String condition, TransactionMethod transactionMethod, String manufactureYear, String location,
                    Boolean hideBidPrice) {
@@ -83,7 +83,7 @@ public class Auction {
         this.goodsName = goodsName;
         this.description = description;
         this.startPrice = startPrice;
-        this.state = state;
+        this.status = status;
         this.startAt = startAt;
         this.endAt = endAt;
         this.condition = condition;
@@ -95,7 +95,7 @@ public class Auction {
 
     public static Auction of(AuctionRequest auctionRequest, User seller) {
         return new Auction(seller, auctionRequest.getItemName(), auctionRequest.getDescription(),
-                auctionRequest.getStartPrice(), AuctionState.IN_PROGRESS, auctionRequest.getStartAt(),
+                auctionRequest.getStartPrice(), AuctionStatus.IN_PROGRESS, auctionRequest.getStartAt(),
                 auctionRequest.getEndAt(), auctionRequest.getCondition(), auctionRequest.getTransactionMethod(),
                 auctionRequest.getManufactureYear(), auctionRequest.getLocation(), auctionRequest.getHideBidPrice());
     }

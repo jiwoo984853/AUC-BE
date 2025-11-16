@@ -1,7 +1,7 @@
 package com.mutsa.springboot_auction.domain.chat.service;
 
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
-import com.mutsa.springboot_auction.domain.auction.entity.AuctionState;
+import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.chat.dto.ChatMessageDto;
 import com.mutsa.springboot_auction.domain.chat.dto.ChatRoomResponseDto;
@@ -38,7 +38,7 @@ public class ChatService {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new RuntimeException("경매를 찾을 수 없습니다"));
 
-        if (auction.getState() != AuctionState.SOLD) {
+        if (auction.getStatus() != AuctionStatus.SOLD) {
             throw new RuntimeException("경매가 낙찰된 상태가 아닙니다");
         }
 
