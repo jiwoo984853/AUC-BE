@@ -106,8 +106,8 @@ public class DeckService {
         return disliked;
     }
 
-    private static Set<String> getCurrentDeckSet(List<String> currentDeck) {
-        return currentDeck == null ? null : new HashSet<>(currentDeck);
+    private Set<String> getCurrentDeckSet(List<String> currentDeck) {
+        return currentDeck == null ? Set.of() : new HashSet<>(currentDeck);
     }
 
 }
