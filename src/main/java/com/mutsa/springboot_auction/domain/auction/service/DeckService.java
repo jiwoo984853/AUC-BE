@@ -23,8 +23,8 @@ public class DeckService {
 
     private static final int DEFAULT_DECK_REFILL_SIZE = 30;
 
-    public List<AuctionDto> getDeck(Long userId, int size) {
-        String deckKey = deckKey(userId);
+    public List<AuctionSimpleResponse> getDeck(Long userId, int size) {
+        String deckKey = RedisKey.deckKey(userId);
 
         Long currentSize = redisTemplate.opsForList().size(deckKey);
 
@@ -48,11 +48,11 @@ public class DeckService {
         Map<Long, Auction> auctionMap = auctions.stream()
                 .collect(Collectors.toMap(Auction::getAuctionId, at -> at));
 
-        List<AuctionDto> result = new ArrayList<>();
+        List<AuctionSimpleResponse> result = new ArrayList<>();
         for (Long id : auctionIds) {
             Auction auction = auctionMap.get(id);
             if (auction != null) {
-                result.add(AuctionDto.from(auction));
+                result.add(AuctionSimpleResponse.from(auction));
             }
         }
         return result;
