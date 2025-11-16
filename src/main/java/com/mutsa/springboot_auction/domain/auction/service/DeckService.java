@@ -45,6 +45,11 @@ public class DeckService {
                 .map(Long::valueOf).toList();
 
         //id로 레포지토리에서 조회
+        return getAuctionSimpleResponses(auctionIds);
+    }
+
+    private List<AuctionSimpleResponse> getAuctionSimpleResponses(List<Long> auctionIds) {
+        //레디스 순서 그대로 가져옴
         List<Auction> auctions = auctionRepository.findAllById(auctionIds);
         Map<Long, Auction> auctionMap = auctions.stream()
                 .collect(Collectors.toMap(Auction::getAuctionId, at -> at));
@@ -76,6 +81,15 @@ public class DeckService {
         LocalDateTime now = LocalDateTime.now();
         List<Auction> candidates = auctionRepository.findByEndAtAfterOrderByAuctionIdDesc(now);
 
+        List<String> toPush = filterCandidates(size, candidates, disliked, currentDeckSet);
+
+        if (!toPush.isEmpty()) {
+            redisTemplate.opsForList().rightPushAll(deckKey, toPush);
+        }
+    }
+
+    private List<String> filterCandidates(int size, List<Auction> candidates, Set<String> disliked,
+                                          Set<String> currentDeckSet) {
         List<String> toPush = new ArrayList<>();
 
         //disLike, 현재 덱에 있으면 안넣음
@@ -92,10 +106,7 @@ public class DeckService {
                 break;
             }
         }
-
-        if (!toPush.isEmpty()) {
-            redisTemplate.opsForList().rightPushAll(deckKey, toPush);
-        }
+        return toPush;
     }
 
     private Set<String> getDisLikeIdSet(String dislikeKey) {
@@ -109,5 +120,4 @@ public class DeckService {
     private Set<String> getCurrentDeckSet(List<String> currentDeck) {
         return currentDeck == null ? Set.of() : new HashSet<>(currentDeck);
     }
-
 }
