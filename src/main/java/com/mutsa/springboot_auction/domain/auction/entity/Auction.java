@@ -6,7 +6,6 @@ import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategor
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
 import com.mutsa.springboot_auction.domain.bid.entity.Bid;
 import com.mutsa.springboot_auction.domain.user.entity.User;
-import com.mutsa.springboot_auction.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,7 +43,7 @@ public class Auction {
     private Integer currentPrice;
 
     @Enumerated(EnumType.STRING)
-    private AuctionStatus status;
+    private AuctionState state;
 
     @Enumerated(EnumType.STRING)
     private TransactionMethod transactionMethod;
@@ -76,7 +75,7 @@ public class Auction {
     private Boolean hideBidPrice;
 
     public Auction(User seller, String goodsName, String description,
-                   Integer startPrice, AuctionStatus status,
+                   Integer startPrice, AuctionState state,
                    LocalDateTime startAt, LocalDateTime endAt,
                    String condition, TransactionMethod transactionMethod, String manufactureYear, String location,
                    Boolean hideBidPrice) {
@@ -84,7 +83,7 @@ public class Auction {
         this.goodsName = goodsName;
         this.description = description;
         this.startPrice = startPrice;
-        this.status = status;
+        this.state = state;
         this.startAt = startAt;
         this.endAt = endAt;
         this.condition = condition;
@@ -96,7 +95,7 @@ public class Auction {
 
     public static Auction of(AuctionRequest auctionRequest, User seller) {
         return new Auction(seller, auctionRequest.getItemName(), auctionRequest.getDescription(),
-                auctionRequest.getStartPrice(), AuctionStatus.IN_PROGRESS, auctionRequest.getStartAt(),
+                auctionRequest.getStartPrice(), AuctionState.IN_PROGRESS, auctionRequest.getStartAt(),
                 auctionRequest.getEndAt(), auctionRequest.getCondition(), auctionRequest.getTransactionMethod(),
                 auctionRequest.getManufactureYear(), auctionRequest.getLocation(), auctionRequest.getHideBidPrice());
     }
