@@ -64,8 +64,8 @@ public class DeckService {
     }
 
     public void refillDeckFromDb(Long userId, int size) {
-        String deckKey = deckKey(userId);
-        String dislikeKey = dislikeKey(userId);
+        String deckKey = RedisKey.deckKey(userId);
+        String dislikeKey = RedisKey.dislikeKey(userId);
 
         List<String> currentDeck = redisTemplate.opsForList().range(deckKey, 0, -1);
         Set<String> currentDeckSet = getCurrentDeckSet(currentDeck);
