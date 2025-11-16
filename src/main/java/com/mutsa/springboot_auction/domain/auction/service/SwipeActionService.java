@@ -67,16 +67,10 @@ public class SwipeActionService {
 
         String idStr = String.valueOf(auctionId);
 
-        long showAgainTime = LocalDateTime.now()
-                .plusMinutes(30)  // 30분 후 다시 등장 가능
-                .atZone(ZoneId.systemDefault())
-                .toInstant()
-                .toEpochMilli();
+        // 1) HOLD 후보 풀(Set)에 넣기
+        redisTemplate.opsForSet().add(holdKey, idStr);
 
-        // 1) HOLD ZSET에 넣기 (나중에 다시 덱에 넣기 위한 후보)
-        redisTemplate.opsForZSet().add(holdKey, idStr, showAgainTime);
-
-        // 2) 현재 덱에서 제거 (당장은 안 보이게)
+        // 2) 현재 덱에서 제거
         redisTemplate.opsForList().remove(deckKey, 0, idStr);
 
         // 3) DB 상태 업데이트
@@ -91,6 +85,4 @@ public class SwipeActionService {
         return userAuctionStateRepository.findByUserIdAndAuctionId(userId, auctionId)
                 .orElseGet(() -> UserAuctionState.create(userId, auctionId, ItemState.NEW));
     }
-
-
 }
