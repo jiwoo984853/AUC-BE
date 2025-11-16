@@ -1,6 +1,7 @@
 package com.mutsa.springboot_auction.domain.auction.controller;
 
-import com.mutsa.springboot_auction.domain.auction.dto.AuctionDto;
+import com.mutsa.springboot_auction.domain.auction.dto.AuctionDetailResponse;
+import com.mutsa.springboot_auction.domain.auction.dto.AuctionSimpleResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionRequest;
 import com.mutsa.springboot_auction.domain.auction.dto.DeckResponse;
 import com.mutsa.springboot_auction.domain.auction.service.AuctionService;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,5 +43,11 @@ public class AuctionController {
         Long userId = customOAuth2User.getUser().getId();
         List<AuctionSimpleResponse> items = deckService.getDeck(userId, size);
         return ResponseEntity.ok(DeckResponse.of(items));
+    }
+
+    //
+    @GetMapping("/auctions/{auctionId}")
+    public ResponseEntity<AuctionDetailResponse> getAuction(@PathVariable Long auctionId) {
+        return ResponseEntity.ok(auctionService.get(auctionId));
     }
 }
