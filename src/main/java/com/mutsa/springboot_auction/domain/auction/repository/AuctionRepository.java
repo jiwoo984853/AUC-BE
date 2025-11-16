@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
-    List<Auction> findByEndAtAfterOrderByIdDesc(LocalDateTime now);
+    List<Auction> findByEndAtAfterOrderByAuctionIdDesc(LocalDateTime now);
 
 }

@@ -1,9 +1,10 @@
 package com.mutsa.springboot_auction.domain.auction.service;
 
 
-import com.mutsa.springboot_auction.domain.auction.dto.AuctionDto;
+import com.mutsa.springboot_auction.domain.auction.dto.AuctionSimpleResponse;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
+import com.mutsa.springboot_auction.domain.auction.util.RedisKey;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -73,7 +74,7 @@ public class DeckService {
         Set<String> disliked = getDisLikeIdSet(dislikeKey);
 
         LocalDateTime now = LocalDateTime.now();
-        List<Auction> candidates = auctionRepository.findByEndAtAfterOrderByIdDesc(now);
+        List<Auction> candidates = auctionRepository.findByEndAtAfterOrderByAuctionIdDesc(now);
 
         List<String> toPush = new ArrayList<>();
 
@@ -109,11 +110,4 @@ public class DeckService {
         return currentDeck == null ? null : new HashSet<>(currentDeck);
     }
 
-    private String deckKey(Long userId) {
-        return "DECK:" + userId;
-    }
-
-    private String dislikeKey(Long userId) {
-        return "DisLike:" + userId;
-    }
 }
