@@ -8,7 +8,10 @@ import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.bid.dto.BidCreateRequestDto;
 import com.mutsa.springboot_auction.domain.bid.dto.BidResponseDto;
 import com.mutsa.springboot_auction.domain.bid.entity.Bid;
+import com.mutsa.springboot_auction.domain.bid.entity.BidStatus;
+import com.mutsa.springboot_auction.domain.bid.entity.DepositStatus;
 import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
+import com.mutsa.springboot_auction.domain.pointHistory.service.PointService;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +30,7 @@ public class BidService {
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
+    private final PointService pointService;
 
     @Transactional
     public BidResponseDto createBid(BidCreateRequestDto requestDto) {
@@ -50,11 +56,50 @@ public class BidService {
         if (prevTopBid != null) {
             User prevUser = prevTopBid.getUser();
             Integer prevDeposit = prevTopBid.getDepositAmount();
+
+            if (prevDeposit == null) {
+                prevDeposit = (int) Math.ceil(requestDto.getBidPrice() * 0.1);
+            }
+
+            prevUser.addPoint(prevDeposit);
+            pointService.saveRefundHistory(prevUser, prevDeposit);
+
+            prevTopBid.setDepositStatus(DepositStatus.REFUNDED);
+            prevTopBid.setStatus(BidStatus.FAILED);
         }
+
+        bidder.subtractPoint(deposit);
+        pointService.saveRefundHistory(bidder, deposit);
+
+        Bid newBid = new Bid();
+        newBid.setAuction(auction);
+        newBid.setUser(bidder);
+        newBid.setBidPrice(requestDto.getBidPrice());
+        newBid.setDepositAmount(deposit);
+        newBid.setDepositStatus(DepositStatus.HELD);
+        newBid.setStatus(BidStatus.PENDING);
+
+        Bid savedBid = bidRepository.save(newBid);
+
+        auction.setCurrentPrice(requestDto.getBidPrice());
+        auction.setWinner(bidder);
+
+        return mapToResponseDto(savedBid);
 
 
 
     }
+
+    @Transactional
+    public List<BidResponseDto> getBidsByAuctionId(Long auctionId) {
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(()-> new EntityNotFoundException("경매를 찾을 수 없습니다. id=" + auctionId));
+
+        List<Bid> bids = bidRepository.findAllByAuctionOrderByCreatedAtDesc(auction);
+
+        return bids.stream().map(this::mapToResponseDto).toList();
+    }
+
 
     private void validateAuctionCanbid(Auction auction) {
         if (auction.getStatus() != AuctionStatus.IN_PROGRESS)  {
