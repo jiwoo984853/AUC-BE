@@ -11,7 +11,4 @@ public class SpringbootAuctionApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbootAuctionApplication.class, args);
 	}
-
-
-
 }
