@@ -44,11 +44,15 @@ cloud:
     stack:
       auto: false
 
-
 jwt:
   secret: my-secret-key-study-springboot-psbsbb
   access-token-expiration: 3600000    # 1시간
   refresh-token-expiration: 1209600000
+
+toss:
+  payments:
+    secret-key: ${TOSS_PAYMENTS_SECRET_KEY}
+    base-url: https://api.tosspayments.com
 
 ---
 # ===============================
@@ -102,6 +106,11 @@ cloud:
     stack:
       auto: false
 
+toss:
+  payments:
+    secret-key: ${TOSS_PAYMENTS_SECRET_KEY}
+    base-url: https://api.tosspayments.com
+
 logging:
   level:
     org.hibernate.orm.jdbc.bind: trace
@@ -152,3 +161,8 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+toss:
+  payments:
+    secret-key: ${TOSS_PAYMENTS_SECRET_KEY}
+    base-url: https://api.tosspayments.com
