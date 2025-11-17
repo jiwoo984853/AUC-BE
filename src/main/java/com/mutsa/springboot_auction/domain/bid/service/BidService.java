@@ -11,6 +11,7 @@ import com.mutsa.springboot_auction.domain.bid.entity.Bid;
 import com.mutsa.springboot_auction.domain.bid.entity.BidStatus;
 import com.mutsa.springboot_auction.domain.bid.entity.DepositStatus;
 import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
+import com.mutsa.springboot_auction.domain.notification.service.NotificationService;
 import com.mutsa.springboot_auction.domain.pointHistory.service.PointService;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
@@ -30,6 +31,7 @@ public class BidService {
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
     private final PointService pointService;
+    private final NotificationService notificationService;
 
     @Transactional
     public BidResponseDto createBid(BidCreateRequestDto requestDto) {
@@ -65,6 +67,13 @@ public class BidService {
 
             prevTopBid.setDepositStatus(DepositStatus.REFUNDED);
             prevTopBid.setStatus(BidStatus.FAILED);
+
+            notificationService.sendOutbidNotification(
+                    prevUser.getId(),
+                    auction.getGoodsName(),
+                    auction.getAuctionId(),
+                    requestDto.getBidPrice()
+            );
         }
 
         bidder.subtractPoint(deposit);
