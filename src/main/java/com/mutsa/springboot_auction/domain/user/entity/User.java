@@ -26,9 +26,12 @@ public class User extends BaseTimeEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "nickname", unique = true)
     private String nickname;
 
-    private String socialId;
 
     @Column(nullable = false)
     private Integer point = 0;
@@ -38,6 +41,12 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
+
+    public User update(String nickname) {
+        this.nickname = nickname;
+
+        return this;
+    }
 
     public void chargePoint(Integer amount) {
         this.point += amount;
