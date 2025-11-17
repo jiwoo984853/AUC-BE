@@ -1,7 +1,12 @@
 package com.mutsa.springboot_auction.domain.qna.repository;
 
-import jakarta.persistence.Entity;
 
+import com.mutsa.springboot_auction.domain.auction.entity.Auction;
+import com.mutsa.springboot_auction.domain.qna.entity.Qna;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface QnaRepository {
+import java.util.List;
+
+public interface QnaRepository extends JpaRepository<Qna, Long> {
+    List<Qna> findAllByAuctionOrderByCreatedAtAsc(Auction auction);
 }
