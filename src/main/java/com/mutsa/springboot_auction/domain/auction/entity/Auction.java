@@ -59,7 +59,7 @@ public class Auction extends BaseTimeEntity {
     @Column(name = "included_items")
     private String includedItems;
 
-    private String year;
+    private String manufactureYear;
     private String location;
 
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL)
