@@ -16,6 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "auction")
 @Getter
+@Setter
+@Builder
+@AllArgsConstructor
 public class Auction {
 
     @Id

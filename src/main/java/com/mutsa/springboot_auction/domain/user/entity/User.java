@@ -34,8 +34,6 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     private String profileImageUrl;
 
-    private String profileImageUrl;
-
     @Column(nullable = false)
     @Builder.Default
     private Integer point = 0;
