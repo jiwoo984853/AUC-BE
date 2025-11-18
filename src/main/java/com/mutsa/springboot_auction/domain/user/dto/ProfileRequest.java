@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class ProfileRequest {
-    String imgUrl;
+    String profileImageUrl;
     String nickname;
 }
