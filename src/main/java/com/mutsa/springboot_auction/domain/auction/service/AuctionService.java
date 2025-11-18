@@ -4,7 +4,11 @@ import com.mutsa.springboot_auction.domain.auction.dto.AuctionDetailResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionRequest;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
+import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
+import com.mutsa.springboot_auction.domain.auctionImage.repository.AuctionImageRepository;
 import com.mutsa.springboot_auction.domain.user.entity.User;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +17,17 @@ import org.springframework.stereotype.Service;
 public class AuctionService {
 
     private final AuctionRepository auctionRepository;
+    private final AuctionImageRepository auctionImageRepository;
     public Long post(User seller, AuctionRequest auctionRequest) {
         //request -> entity
         Auction auction = Auction.of(auctionRequest, seller);
         //저장
         Auction savedAuction = auctionRepository.save(auction);
+        List<AuctionImage> auctionImages = new ArrayList<>();
+        for (String imageUrl : auctionRequest.getImageUrls()) {
+            auctionImages.add(new AuctionImage(imageUrl, savedAuction));
+        }
+        auctionImageRepository.saveAll(auctionImages);
         return savedAuction.getAuctionId();
     }
 
