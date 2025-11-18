@@ -1,6 +1,7 @@
 package com.mutsa.springboot_auction.domain.user.controller;
 
 import com.mutsa.springboot_auction.domain.user.dto.ProfileRequest;
+import com.mutsa.springboot_auction.domain.user.dto.UserResponse;
 import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
@@ -18,9 +19,9 @@ public class UserController {
     private final UserService userService;
 
     @PutMapping("/user/profile")
-    public ResponseEntity<Long> updateProfile(@RequestBody ProfileRequest request,
-                                              @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+    public ResponseEntity<UserResponse> updateProfile(@RequestBody ProfileRequest request,
+                                                      @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
         User user = customOAuth2User.getUser();
-        return ResponseEntity.ok(userService.updateProfile(request, user).getId());
+        return ResponseEntity.ok(UserResponse.from(userService.updateProfile(request, user)));
     }
 }
