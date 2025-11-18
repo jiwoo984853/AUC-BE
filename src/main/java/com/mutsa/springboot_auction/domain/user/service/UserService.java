@@ -26,8 +26,8 @@ public class UserService {
         if (request.getNickname() != null) {
             user.updateNickname(request.getNickname());
         }
-        if (request.getImgUrl() != null) {
-            user.updateProfileImg(request.getImgUrl());
+        if (request.getProfileImageUrl() != null) {
+            user.updateProfileImg(request.getProfileImageUrl());
         }
 
         return userRepository.save(user);
