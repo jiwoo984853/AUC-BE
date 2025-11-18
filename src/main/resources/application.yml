@@ -51,7 +51,7 @@ jwt:
 
 toss:
   payments:
-    secret-key: ${TOSS_SECRET_KEY123}
+    secret-key: ${TOSS_SECRET_KEY}
     base-url: https://api.tosspayments.com
 
 ---
@@ -108,7 +108,7 @@ cloud:
 
 toss:
   payments:
-    secret-key: ${TOSS_SECRET_KEY123}
+    secret-key: ${TOSS_SECRET_KEY}
     base-url: https://api.tosspayments.com
 
 logging:
@@ -164,5 +164,5 @@ cloud:
 
 toss:
   payments:
-    secret-key: ${TOSS_SECRET_KEY123}
+    secret-key: ${TOSS_SECRET_KEY}
     base-url: https://api.tosspayments.com
