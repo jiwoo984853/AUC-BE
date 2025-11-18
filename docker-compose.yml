@@ -20,7 +20,7 @@ services:
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
       - JWT_SECRET=${JWT_SECRET}
-      - TOSS_SECRET_KEY=${TOSS_SECRET_KEY123}
+      - TOSS_SECRET_KEY=${TOSS_SECRET_KEY}
     networks:
       - auction-network
 
