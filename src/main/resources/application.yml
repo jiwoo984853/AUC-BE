@@ -46,7 +46,7 @@ cloud:
 
 
 jwt:
-  secret: my-secret-key-study-springboot-psbsbb
+  secret: ${JWT_SECRET}
   access-token-expiration: 3600000    # 1시간
   refresh-token-expiration: 1209600000
 
@@ -152,3 +152,8 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 3600000    # 1시간
+  refresh-token-expiration: 1209600000
