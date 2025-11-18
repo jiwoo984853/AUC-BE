@@ -43,4 +43,24 @@ public class ChatRoomController {
 
         return ResponseEntity.ok(messages);
     }
+
+    // 거래완료 처리
+    @PostMapping("/chat/rooms/{roomId}/complete")
+    public ResponseEntity<String> completeTransaction(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal(expression = "user") User currentUser
+    ) {
+        chatService.completeTransaction(roomId, currentUser.getId());
+        return ResponseEntity.ok("거래가 완료되었습니다");
+    }
+
+    // 거래완료 처리 - 테스트용
+    @PostMapping("/chat/rooms/{roomId}/complete/test")
+    public ResponseEntity<String> completeTransactionTest(
+            @PathVariable Long roomId,
+            @RequestParam Long userId
+    ) {
+        chatService.completeTransaction(roomId, userId);
+        return ResponseEntity.ok("거래가 완료되었습니다");
+    }
 }

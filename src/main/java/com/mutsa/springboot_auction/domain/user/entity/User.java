@@ -34,7 +34,10 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     private String profileImageUrl;
 
+    private String profileImageUrl;
+
     @Column(nullable = false)
+    @Builder.Default
     private Integer point = 0;
 
     @Enumerated(EnumType.STRING)
@@ -61,7 +64,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.point += amount;
     }
 
-    public void substractPoint(Integer amount) {
+    public void subtractPoint(Integer amount) {
         this.point -= amount;
     }
 
