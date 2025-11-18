@@ -2,6 +2,10 @@
 # default (local/test) 환경 → H2 사용
 # ===============================
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL   # ✅ MySQL 호환 모드
     username: sa
@@ -59,6 +63,10 @@ toss:
 # dev 환경 → MySQL 사용
 # ===============================
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
   config:
     activate:
       on-profile: dev
@@ -120,6 +128,10 @@ logging:
 # prod 환경 → MySQL 사용
 # ===============================
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
   config:
     activate:
       on-profile: prod
