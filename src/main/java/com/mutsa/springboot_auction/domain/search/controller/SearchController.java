@@ -1,9 +1,14 @@
 package com.mutsa.springboot_auction.domain.search.controller;
 
+import com.mutsa.springboot_auction.domain.search.dto.RecentSearchResponse;
+import com.mutsa.springboot_auction.domain.search.dto.SearchFilterRequest;
 import com.mutsa.springboot_auction.domain.search.dto.SearchResponse;
 import com.mutsa.springboot_auction.domain.search.service.SearchService;
+import com.mutsa.springboot_auction.domain.user.entity.User;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +29,66 @@ public class SearchController {
     @GetMapping("/category/{categoryId}/keyword")
     public ResponseEntity<List<SearchResponse>> searchAuctionsInCategory(
             @PathVariable Long categoryId,
-            @RequestParam String keyword) {
-        List<SearchResponse> auctions = searchService.searchAuctionsInCategory(categoryId, keyword);
+            @RequestParam String keyword,
+            @AuthenticationPrincipal(expression = "user") User currentUser) {
+        Long userId = currentUser.getId();
+        List<SearchResponse> auctions = searchService.searchAuctionsInCategory(userId, categoryId, keyword);
         return ResponseEntity.ok(auctions);
+    }
+
+
+    @GetMapping("/all")
+    public ResponseEntity<List<SearchResponse>> searchAllAuctions(
+            @RequestParam String keyword,
+            @AuthenticationPrincipal(expression = "user") User currentUser,
+            HttpSession session
+    ) {
+        Long userId = currentUser.getId();
+        List<SearchResponse> auctions = searchService.searchAllAuctions(userId, keyword);
+
+        session.setAttribute("searchResults_" + userId, auctions);
+        session.setAttribute("searchKeyword_" + userId, keyword);
+
+        return ResponseEntity.ok(auctions);
+    }
+
+    @PostMapping("/all/filter")
+    public ResponseEntity<List<SearchResponse>> applyFilter(
+            @AuthenticationPrincipal(expression = "user") User currentUser,
+            @RequestBody SearchFilterRequest filterRequest,
+            HttpSession session) {
+        Long userId = currentUser.getId();
+        @SuppressWarnings("unchecked")
+        List<SearchResponse> searchResults =
+                (List<SearchResponse>) session.getAttribute("searchResults_" + userId);
+
+
+        if (searchResults == null) {
+            throw new RuntimeException("검색 결과가 없습니다. 먼저 검색을 해주세요");
+        }
+
+        List<SearchResponse> filteredResults =
+                searchService.applyFiltersToSessionResults(searchResults, filterRequest);
+
+        return ResponseEntity.ok(filteredResults);
+    }
+
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<RecentSearchResponse>> getRecentSearches(
+            @AuthenticationPrincipal(expression = "user") User currentUser
+    ) {
+        Long userId = currentUser.getId();
+        return ResponseEntity.ok(searchService.getRecentSearches(userId));
+    }
+
+    @DeleteMapping("/recent/{recentId}")
+    public ResponseEntity<Void> deleteRecentSearch(
+            @PathVariable Long recentId,
+            @AuthenticationPrincipal(expression = "user") User currentUser
+    ) {
+        Long userId = currentUser.getId();
+        searchService.deleteRecentSearch(recentId, userId);
+        return ResponseEntity.ok().build();
     }
 }

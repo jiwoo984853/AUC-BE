@@ -273,6 +273,7 @@
             showMessage('시스템', `채팅방 ID: ${roomId}, 사용자 ID: ${userId}`, 'system');
             console.log('Connected: ' + frame);
 
+            // 브로드캐스트
             const subscribeUrl = '/topic/chat/rooms/' + roomId;
             showMessage('시스템', '채팅방 구독 중: ' + subscribeUrl, 'system');
 
@@ -335,7 +336,7 @@
             senderId: userId,
             messageContent: messageContent
         };
-
+        // sendMessage 메서드 호출
         const sendUrl = '/app/chat/rooms/' + roomId + '/send';
         console.log('Sending message:', message, 'to', sendUrl);
         stompClient.send(sendUrl, {}, JSON.stringify(message));

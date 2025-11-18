@@ -1,6 +1,29 @@
 version: '3.8'
 
 services:
+  springboot-auction:
+    container_name: springboot-auction
+    image: gtaeu/springboot-auction:latest
+    platform: linux/amd64
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-auction.cjgqoaggg3c5.ap-northeast-2.rds.amazonaws.com:3306/auctiondb
+      - SPRING_DATASOURCE_USERNAME=dev
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - OAUTH_KAKAO_CLIENT_ID=${OAUTH_KAKAO_CLIENT_ID}
+      - OAUTH_KAKAO_CLIENT_SECRET=${OAUTH_KAKAO_CLIENT_SECRET}
+      - DOMAIN=mmuuttssaa.shop
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - JWT_SECRET=${JWT_SECRET}
+      - TOSS_SECRET_KEY=${TOSS_SECRET_KEY}
+    networks:
+      - auction-network
+
   nginx-auction:
     container_name: nginx-auction
     image: nginx:latest
@@ -25,25 +48,10 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-
-  springboot-auction:
-    container_name: springboot-auction
-    image: gtaeu/springboot-auction:latest
-    platform: linux/amd64
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-auction.cjgqoaggg3c5.ap-northeast-2.rds.amazonaws.com:3306/auctiondb
-      - SPRING_DATASOURCE_USERNAME=dev
-      - SPRING_DATASOURCE_PASSWORD=dev123
-      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}  # ← .env 파일에서
-      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
-      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
     networks:
       - auction-network
 
-
 networks:
   auction-network:
+    name: auction-network   # 👈 네트워크 이름을 강제로 고정
     driver: bridge

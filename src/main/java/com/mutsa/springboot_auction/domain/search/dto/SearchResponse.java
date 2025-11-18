@@ -17,4 +17,7 @@ public class SearchResponse {
     private String remainingTime;
     private Integer currentPrice;
     private String imageUrl;
+    private String condition;
+    private String year;
+    private Long categoryId;
 }

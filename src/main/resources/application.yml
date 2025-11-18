@@ -48,18 +48,25 @@ cloud:
     stack:
       auto: false
 
-
 jwt:
   secret: my-secret-key-study-springboot-psbsbb
   access-token-expiration: 3600000    # 1시간
   refresh-token-expiration: 1209600000
 
+toss:
+  payments:
+    secret-key: ${TOSS_SECRET_KEY}
+    base-url: https://api.tosspayments.com
 
 ---
 # ===============================
 # dev 환경 → MySQL 사용
 # ===============================
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
   config:
     activate:
       on-profile: dev
@@ -107,6 +114,11 @@ cloud:
     stack:
       auto: false
 
+toss:
+  payments:
+    secret-key: ${TOSS_SECRET_KEY}
+    base-url: https://api.tosspayments.com
+
 logging:
   level:
     org.hibernate.orm.jdbc.bind: trace
@@ -116,6 +128,10 @@ logging:
 # prod 환경 → MySQL 사용
 # ===============================
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
   config:
     activate:
       on-profile: prod
@@ -157,3 +173,8 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+toss:
+  payments:
+    secret-key: ${TOSS_SECRET_KEY}
+    base-url: https://api.tosspayments.com

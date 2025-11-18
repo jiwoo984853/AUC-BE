@@ -40,3 +40,6 @@ out/
 application-local.yml
 application.properties
 application-*.properties
+
+# environment vaules
+.env

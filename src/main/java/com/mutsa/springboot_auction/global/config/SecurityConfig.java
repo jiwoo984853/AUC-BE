@@ -75,7 +75,10 @@ public class SecurityConfig {
                         "/topic/**",           // STOMP 구독
                         "/queue/**",           // ← 추가 (개인 메시지용)
                         "/chat-test.html",
-                        "/api/search/**"
+                        "/api/search/**",
+                        "/api/notification/**",
+                        "/api/chat/rooms/*/complete/test",
+                        "/api/categories"
                 ).permitAll()
 
                 // 나머지 모든 요청은 인증 필요
@@ -98,15 +101,7 @@ public class SecurityConfig {
             )
             .exceptionHandling(exception -> exception
                     .authenticationEntryPoint((request, response, authException) -> {
-                        String requestURI = request.getRequestURI();
-
-                        // permitAll 경로는 401 반환
-                        if (requestURI.startsWith("/api/")) {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                        } else {
-                            // 그 외는 로그인 페이지로
-                            response.sendRedirect("/login");
-                        }
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                     })
             )
             // === 커스텀 필터 추가 ===
@@ -126,21 +121,19 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 허용할 도메인 설정 (개발환경)
+        // ✅ 배포 도메인 추가
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",    // React 개발 서버
-            "http://localhost:8080"     // 같은 서버
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "https://mmuuttssaa.shop",      // ✅ 추가
+                "http://mmuuttssaa.shop"        // ✅ 추가
         ));
 
-        // 허용할 HTTP 메서드
         configuration.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
 
-        // 허용할 헤더
         configuration.setAllowedHeaders(Arrays.asList("*"));
-
-        // 인증 정보 포함 허용 (쿠키, Authorization 헤더 등)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
