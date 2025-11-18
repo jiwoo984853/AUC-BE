@@ -32,6 +32,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(name = "nickname", unique = true)
     private String nickname;
 
+    private String profileImageUrl;
 
     @Column(nullable = false)
     private Integer point = 0;
@@ -42,9 +43,8 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
-    public User update(String nickname) {
-        this.nickname = nickname;
-
+    public User updateProfileImg(String imgUrl) {
+        this.profileImageUrl = imgUrl;
         return this;
     }
 
