@@ -7,6 +7,7 @@ import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
@@ -31,13 +33,18 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
     // ❷ 유저가 있으면 업데이트, 없으면 유저 생성
     private User saveOrUpdate(OAuth2User oAuth2User) {
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        log.info("=================================");
+        log.info("{}", attributes);
+        log.info("=================================");
 
-        String email = (String) attributes.get("email");
+//        String socialId = (String) attributes.get("id");
+        String socialId = (String) oAuth2User.getName();
+
         String name = (String) attributes.get("name");
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findBySocialId(socialId)
                 .orElse(User.builder()
-                        .email(email)
+                        .socialId(socialId)
                         .nickname(name)
                         .socialType(SocialType.KAKAO)
                         .role(Role.USER)
