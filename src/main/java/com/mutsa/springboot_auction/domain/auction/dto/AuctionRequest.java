@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class AuctionRequest {
 
     @NotBlank(message = "상품명은 필수입니다.")
-    private String itemName;
+    private String goodsName;
 
     @NotBlank(message = "상품 설명은 필수입니다.")
     private String description;
@@ -37,6 +38,10 @@ public class AuctionRequest {
 
     private String manufactureYear;
     private String location;
+
+    private List<String> imageUrls;
+
+    private List<Integer> categoryIds;
 
     @NotNull(message = "입찰가 숨김 여부를 입력해주세요.")
     private Boolean hideBidPrice;

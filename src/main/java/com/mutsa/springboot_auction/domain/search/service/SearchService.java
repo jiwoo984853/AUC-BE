@@ -187,7 +187,7 @@ public class SearchService {
                 .remainingTime(remainingTime)
                 .status(statusText)
                 .imageUrl(imageUrl)
-                .year(auction.getYear())
+                .year(auction.getManufactureYear())
                 .categoryId(categoryId)
                 .condition(auction.getCondition())
                 .build();

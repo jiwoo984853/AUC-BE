@@ -6,16 +6,34 @@ import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategor
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
 import com.mutsa.springboot_auction.domain.bid.entity.Bid;
 import com.mutsa.springboot_auction.domain.user.entity.User;
-import jakarta.persistence.*;
-import lombok.*;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
 @Table(name = "auction")
 @Getter
+@Setter
+@Builder
+@AllArgsConstructor
 public class Auction {
 
     @Id
@@ -57,11 +75,9 @@ public class Auction {
     @Column(name = "item_condition")
     private String condition;
 
-    @Column(name = "included_items")
-    private String includedItems;
-
     private String manufactureYear;
     private String location;
+    private Boolean hideBidPrice;
 
     // 결제 완료하면 COMPLETED로 바뀜
     @Enumerated(EnumType.STRING)
@@ -78,13 +94,12 @@ public class Auction {
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bid> bids;
 
-    private Boolean hideBidPrice;
+
 
     public Auction(User seller, String goodsName, String description,
                    Integer startPrice, AuctionStatus status,
-                   LocalDateTime startAt, LocalDateTime endAt,
-                   String condition, TransactionMethod transactionMethod, String manufactureYear, String location,
-                   Boolean hideBidPrice) {
+                   LocalDateTime startAt, LocalDateTime endAt, boolean hideBidPrice,
+                   String condition, TransactionMethod transactionMethod, String manufactureYear, String location) {
         this.seller = seller;
         this.goodsName = goodsName;
         this.description = description;
@@ -100,10 +115,11 @@ public class Auction {
     }
 
     public static Auction of(AuctionRequest auctionRequest, User seller) {
-        return new Auction(seller, auctionRequest.getItemName(), auctionRequest.getDescription(),
+        return new Auction(seller, auctionRequest.getGoodsName(), auctionRequest.getDescription(),
                 auctionRequest.getStartPrice(), AuctionStatus.IN_PROGRESS, auctionRequest.getStartAt(),
-                auctionRequest.getEndAt(), auctionRequest.getCondition(), auctionRequest.getTransactionMethod(),
-                auctionRequest.getManufactureYear(), auctionRequest.getLocation(), auctionRequest.getHideBidPrice());
+                auctionRequest.getEndAt(), auctionRequest.getHideBidPrice(), auctionRequest.getCondition(),
+                auctionRequest.getTransactionMethod(),
+                auctionRequest.getManufactureYear(), auctionRequest.getLocation());
     }
 }
 
