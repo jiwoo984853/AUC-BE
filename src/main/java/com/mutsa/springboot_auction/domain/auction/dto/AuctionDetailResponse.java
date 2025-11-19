@@ -15,29 +15,42 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class AuctionDetailResponse {
-    private Long id;
-    private String title;
-    private String description;
-    private List<String> image_url;
-    private AuctionStatus status;
-    private LocalDateTime ends_at;
-
+    private Long auctionId;
     private UserResponse seller;
-
-    private int current_price;
-
-    private String location;
-    private String condition;
+    private String goodsName;
+    private String description;
+    private Integer startPrice;
+    private List<String> imageUrl;
+    private AuctionStatus status;
     private TransactionMethod transactionMethod;
+    private LocalDateTime startAt;
+    private LocalDateTime endAt;
+    private String condition;
     private String manufactureYear;
+    private String location;
+    private Boolean hideBidPrice;
     public static AuctionDetailResponse from(Auction auction) {
-        List<String> imageUrls = auction.getImages().stream().map(AuctionImage::getImageUrl).toList();
+        List<String> imageUrls = auction.getImages()
+                .stream()
+                .map(AuctionImage::getImageUrl)
+                .toList();
 
-        return new AuctionDetailResponse(auction.getAuctionId(), auction.getGoodsName(), auction.getDescription(),
-                imageUrls, auction.getStatus(),
-                auction.getEndAt(), UserResponse.from(auction.getSeller()), auction.getCurrentPrice(),
-                auction.getLocation(), auction.getCondition(), auction.getTransactionMethod(),
-                auction.getManufactureYear());
+        return new AuctionDetailResponse(
+                auction.getAuctionId(),
+                UserResponse.from(auction.getSeller()),
+                auction.getGoodsName(),
+                auction.getDescription(),
+                auction.getStartPrice(),
+                imageUrls,
+                auction.getStatus(),
+                auction.getTransactionMethod(),
+                auction.getStartAt(),
+                auction.getEndAt(),
+                auction.getCondition(),
+                auction.getManufactureYear(),
+                auction.getLocation(),
+                auction.getHideBidPrice()   // Auction에서는 hideBidPrice 라서 이름 맞춰야 함
+        );
     }
 
 }
