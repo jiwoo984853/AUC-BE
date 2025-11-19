@@ -13,14 +13,14 @@ public interface SearchRepository extends JpaRepository<Auction, Long> {
     @Query("select a from Auction a " +
             "join a.categories ac " +
             "where ac.id.categoryId = :categoryId " +
-            "order by a.createdAt desc")
+            "order by a.auctionId desc")
     public List<Auction> getAuctionsByCategory(@Param("categoryId") Long categoryId);
 
 
     @Query("select a from Auction a " +
             "join a.categories ac " +
             "where ac.id.categoryId = :categoryId and replace(a.goodsName, ' ', '') like %:keyword% " +
-            "order by a.createdAt desc")
+            "order by a.auctionId desc")
     public List<Auction> searchInCategory(
             @Param("categoryId") Long categoryId,
             @Param("keyword") String keyword
@@ -28,6 +28,6 @@ public interface SearchRepository extends JpaRepository<Auction, Long> {
 
     @Query("select a from Auction a " +
             "where replace(a.goodsName, ' ', '') like %:keyword% " +
-            "order by a.createdAt desc")
+            "order by a.auctionId desc")
     public List<Auction> searchAllAuctions(@Param("keyword") String keyword);
 }

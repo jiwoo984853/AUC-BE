@@ -1,5 +1,6 @@
 package com.mutsa.springboot_auction.global.config;
 
+import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import com.mutsa.springboot_auction.domain.user.service.UserService;
 import com.mutsa.springboot_auction.global.config.jwt.TokenProvider;
 import com.mutsa.springboot_auction.global.config.jwt.repository.RefreshTokenRepository;
@@ -32,7 +33,7 @@ public class SecurityConfig {
     private final OAuth2UserCustomService oAuth2UserCustomService;
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     /**
      * Spring Security 필터 체인 설정
@@ -167,7 +168,7 @@ public class SecurityConfig {
         return new OAuth2SuccessHandler(tokenProvider,
                 refreshTokenRepository,
                 oAuth2AuthorizationRequestBasedOnCookieRepository(),
-                userService
+                userRepository
         );
     }
 
