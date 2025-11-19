@@ -71,6 +71,7 @@ public class SecurityConfig {
                                 "/login/**",
                                 "/oauth2/**",
                                 "/h2-console/**",
+                                "/login/oauth2/**",
                                 "/api/auth/**",
                                 "/api/points/**",
                                 "/api/s3/**",          // ← 패턴 변경
