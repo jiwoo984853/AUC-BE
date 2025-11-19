@@ -2,6 +2,8 @@
 # default (local/test) 환경 → H2 사용
 # ===============================
 spring:
+  server:
+    forward-headers-strategy: native
   data:
     redis:
       host: localhost
@@ -63,6 +65,8 @@ toss:
 # dev 환경 → MySQL 사용
 # ===============================
 spring:
+  server:
+    forward-headers-strategy: native
   data:
     redis:
       host: localhost
@@ -128,6 +132,8 @@ logging:
 # prod 환경 → MySQL 사용
 # ===============================
 spring:
+  server:
+    forward-headers-strategy: native
   data:
     redis:
       host: localhost
