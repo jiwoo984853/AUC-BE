@@ -24,4 +24,9 @@ public class AuctionImage extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auctionId", nullable = false)
     private Auction auction;
+
+    public AuctionImage(String imageUrl, Auction auction) {
+        this.imageUrl = imageUrl;
+        this.auction = auction;
+    }
 }
