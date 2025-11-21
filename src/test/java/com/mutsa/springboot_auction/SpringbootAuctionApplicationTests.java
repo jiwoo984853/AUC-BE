@@ -11,5 +11,4 @@ class SpringbootAuctionApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

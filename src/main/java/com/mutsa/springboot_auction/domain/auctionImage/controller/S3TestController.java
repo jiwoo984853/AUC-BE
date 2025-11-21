@@ -2,6 +2,7 @@ package com.mutsa.springboot_auction.domain.auctionImage.controller;
 
 import com.mutsa.springboot_auction.domain.auctionImage.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,14 +15,17 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/s3/test")
+@Slf4j
 public class S3TestController {
 
     private final S3Service s3Service;
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadTest(@RequestParam("file")MultipartFile file) {
+        log.info("배포가 되는게 맞나");
         try {
             String imageUrl = s3Service.upload(file);
+
             return ResponseEntity.ok(imageUrl);
         } catch (IOException e) {
             return ResponseEntity.status(500).body("업로드실패");
