@@ -1,6 +1,8 @@
 package com.mutsa.springboot_auction.global.config.jwt;
 
+import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
 import com.mutsa.springboot_auction.domain.user.entity.User;
+import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
@@ -8,9 +10,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.lang.reflect.Member;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +27,8 @@ public class TokenProvider {
 
     @Value("${jwt.secret}")
     private String secretKey;
+
+    private final UserRepository userRepository;
 
 
     public String generateToken(User user, Duration expiredAt) {
@@ -66,10 +68,20 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
-        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+        Long userId = claims.get("id", Long.class);
 
-        return new UsernamePasswordAuthenticationToken(new org.springframework.security.core.userdetails.User(claims.getSubject
-                (), "", authorities), token, authorities);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("id", user.getSocialId());  // 4581577075
+        CustomOAuth2User customOAuth2User = new CustomOAuth2User(user, attributes);
+
+        return new UsernamePasswordAuthenticationToken(
+                customOAuth2User,
+                null,
+                customOAuth2User.getAuthorities()
+        );
     }
 
     public Long getUserId(String token) {
