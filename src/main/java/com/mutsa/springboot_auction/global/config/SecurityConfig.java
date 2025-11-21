@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/login/**",
+                                "/token/**",
                                 "/oauth2/**",
                                 "/h2-console/**",
                                 "/login/oauth2/**",
@@ -85,7 +86,8 @@ public class SecurityConfig {
                                 "/queue/**",           // ← 추가 (개인 메시지용)
                                 "/chat-test.html",
                                 "/api/search/**",
-                                "/hc"
+                                "/hc",
+                                "/error"
                         ).permitAll()
 
                         // 나머지 모든 요청은 인증 필요
