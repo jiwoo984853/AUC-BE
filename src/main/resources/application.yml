@@ -30,7 +30,7 @@ spring:
             client-secret: ${OAUTH_KAKAO_CLIENT_SECRET}
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            redirect-uri: https://mmuuttssa.shop/login/oauth2/code/kakao
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
             client-name: Kakao
         provider:
           kakao:
@@ -97,7 +97,7 @@ spring:
             client-secret: ${OAUTH_KAKAO_CLIENT_SECRET}
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            redirect-uri: https://mmuuttssa.shop/login/oauth2/code/kakao
+            redirect-uri: https://mmuuttssaa.shop/login/oauth2/code/kakao
             client-name: Kakao
         provider:
           kakao:
