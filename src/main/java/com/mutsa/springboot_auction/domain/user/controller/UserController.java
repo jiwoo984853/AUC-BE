@@ -26,8 +26,8 @@ public class UserController {
         return ResponseEntity.ok(UserResponse.from(userService.updateProfile(request, user)));
     }
 
-    @GetMapping("/user/prifile")
-    public ResponseEntity<UserResponse> getPofile(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+    @GetMapping("/user/profile")
+    public ResponseEntity<UserResponse> getProfile(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
         User user = customOAuth2User.getUser();
         return ResponseEntity.ok(UserResponse.from(user));
     }
