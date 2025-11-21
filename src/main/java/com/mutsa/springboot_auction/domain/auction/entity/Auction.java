@@ -20,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -86,7 +87,7 @@ public class Auction {
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL)
-    private List<AuctionCategory> categories;
+    private List<AuctionCategory> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AuctionImage> images;
@@ -120,6 +121,11 @@ public class Auction {
                 auctionRequest.getEndAt(), auctionRequest.getHideBidPrice(), auctionRequest.getCondition(),
                 auctionRequest.getTransactionMethod(),
                 auctionRequest.getManufactureYear(), auctionRequest.getLocation());
+    }
+
+    public void addCategory(AuctionCategory auctionCategory) {
+        this.categories.add(auctionCategory); // Auction 객체 내부의 리스트 관리
+        auctionCategory.setAuction(this);      // AuctionCategory 객체의 FK 필드 설정
     }
 }
 

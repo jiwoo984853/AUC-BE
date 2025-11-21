@@ -41,7 +41,7 @@ public class AuctionRequest {
 
     private List<String> imageUrls;
 
-    private List<Integer> categoryIds;
+    private List<Long> categoryIds;
 
     @NotNull(message = "입찰가 숨김 여부를 입력해주세요.")
     private Boolean hideBidPrice;

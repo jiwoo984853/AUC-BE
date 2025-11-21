@@ -17,7 +17,8 @@ import lombok.*;
 public class AuctionCategory extends BaseTimeEntity {
 
     @EmbeddedId
-    private AuctionCategoryId id;
+    @Builder.Default
+    private AuctionCategoryId id = new AuctionCategoryId();
 
     @MapsId("categoryId")
     @ManyToOne(fetch = FetchType.LAZY)
