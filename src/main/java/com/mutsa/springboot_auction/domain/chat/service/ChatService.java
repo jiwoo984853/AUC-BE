@@ -17,6 +17,7 @@ import com.mutsa.springboot_auction.domain.pointHistory.repository.PointHistoryR
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatService {
 
     private final AuctionRepository auctionRepository;
@@ -64,7 +66,14 @@ public class ChatService {
                     return chatRoomRepository.save(newRoom);
                 });
 
-        return new ChatRoomResponseDto(chatRoom);
+        return ChatRoomResponseDto.builder()
+                .chatRoomId(chatRoom.getChatroomId())
+                .auctionId(chatRoom.getAuction().getAuctionId())
+                .buyerId(chatRoom.getBuyer().getId())
+                .buyerNickname(chatRoom.getBuyer().getNickname())
+                .sellerId(chatRoom.getSeller().getId())
+                .sellerNickname(chatRoom.getSeller().getNickname())
+                .build();
     }
 
     /**
@@ -72,11 +81,13 @@ public class ChatService {
      */
     @Transactional(readOnly = true)
     public List<MessageResponseDto> getMessages(Long roomId, Long userId) {
+
         // 채팅방 찾기
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() ->new RuntimeException("채팅방을 찾을 수 없습니다"));
 
         // 접근 권한(요청한 userId가 낙찰자 또는 판매자 맞는지 확인)
+
         if (!chatRoom.getBuyer().getId().equals(userId) && !chatRoom.getSeller().getId().equals(userId)) {
             throw new RuntimeException("접근 권한이 없습니다");
         }
