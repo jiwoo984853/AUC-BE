@@ -1,5 +1,6 @@
 package com.mutsa.springboot_auction.domain.pointHistory.service;
 
+import com.mutsa.springboot_auction.domain.pointHistory.dto.PointHistoryResponse;
 import com.mutsa.springboot_auction.domain.pointHistory.entity.HistoryType;
 import com.mutsa.springboot_auction.domain.pointHistory.entity.PointHistory;
 import com.mutsa.springboot_auction.domain.pointHistory.repository.PointHistoryRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mutsa.springboot_auction.domain.pointHistory.entity.HistoryType.CHARGE;
 
@@ -74,7 +76,10 @@ public class PointService {
         pointHistoryRepository.save(history);
     }
 
-    public List<PointHistory> getHistory(User user) {
-        return pointHistoryRepository.findByUserOrderByHistoryIdDesc(user);
+    public List<PointHistoryResponse> getHistory(User user) {
+        List<PointHistory> list = pointHistoryRepository.findByUserOrderByHistoryIdDesc(user);
+        return list.stream()
+                .map(PointHistoryResponse::of)
+                .collect(Collectors.toList());
     }
 }
