@@ -5,8 +5,7 @@ import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
 import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
-import com.mutsa.springboot_auction.domain.bid.dto.BidCreateRequestDto;
-import com.mutsa.springboot_auction.domain.bid.dto.BidResponseDto;
+import com.mutsa.springboot_auction.domain.bid.dto.*;
 import com.mutsa.springboot_auction.domain.bid.entity.Bid;
 import com.mutsa.springboot_auction.domain.bid.entity.BidStatus;
 import com.mutsa.springboot_auction.domain.bid.entity.DepositStatus;
@@ -22,7 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -146,5 +148,68 @@ public class BidService {
                 bid.getStatus(),
                 bid.getDepositStatus()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public MyAuctionSummaryResponseDto getMyAuctionSummary(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new EntityNotFoundException("사용자를 찾을 수 없습니다. id=" + userId));
+
+        List<Bid> bids = bidRepository.findAllByUserOrderByCreatedAtDesc(user);
+        Map<Long,Bid> latestBidByAuction = new LinkedHashMap<>();
+        for (Bid bid : bids) {
+            Long auctionId = bid.getAuction().getAuctionId();
+            if(!latestBidByAuction.containsKey(auctionId)) {
+                latestBidByAuction.put(auctionId, bid);
+            }
+        }
+        List<WonItemResponseDto> wonItems = new ArrayList<>();
+        List<BidItemResponseDto> bidItems = new ArrayList<>();
+
+        latestBidByAuction.values().forEach(bid -> {
+            Auction auction = bid.getAuction();
+
+            Integer price = auction.getCurrentPrice() != null
+                    ? auction.getCurrentPrice()
+                    : auction.getStartPrice();
+            Long auctionId = auction.getAuctionId();
+            String goodsName = auction.getGoodsName();
+            String imageUrl = extractThumbnailUrl(auction);
+
+            Long winnerId = auction.getWinner() != null ? auction.getWinner().getId() : null;
+            AuctionStatus auctionStatus = auction.getStatus();
+
+            boolean isEnded = auctionStatus != AuctionStatus.IN_PROGRESS;
+            boolean isMineWinner = winnerId != null && winnerId.equals(userId);
+
+            if (isEnded && isMineWinner) {
+                WonItemResponseDto won = new WonItemResponseDto(
+                        auctionId,
+                        goodsName,
+                        price,
+                        imageUrl
+                );
+                wonItems.add(won);
+            } else {
+                String status = isEnded ? "Fail" :  "IN_PROGRESS";
+
+                BidItemResponseDto bidItem = new BidItemResponseDto(
+                        auctionId,
+                        goodsName,
+                        price,
+                        imageUrl,
+                        status
+                );
+                bidItems.add(bidItem);
+            }
+        });
+        return new MyAuctionSummaryResponseDto(wonItems, bidItems);
+
+    }
+    private String extractThumbnailUrl(Auction auction) {
+        if (auction.getImages() == null || auction.getImages().isEmpty()) {
+            return null;
+        }
+        return auction.getImages().get(0).getImageUrl();
     }
 }

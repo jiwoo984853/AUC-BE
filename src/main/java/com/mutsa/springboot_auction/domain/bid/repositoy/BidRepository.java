@@ -22,4 +22,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     long countByAuctionAndUserAndStatus(Auction auction, User user, BidStatus status);
 
     List<Bid> findAllByAuctionOrderByCreatedAtDesc(Auction auction);
+
+    List<Bid> findAllByUserOrderByCreatedAtDesc(User user);
 }
