@@ -20,4 +20,5 @@ public class BidResponseDto {
     private Integer depositAmount;
     private BidStatus status;
     private DepositStatus depositStatus;
+    private String profileImageUrl;
 }
