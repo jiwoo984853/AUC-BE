@@ -151,6 +151,8 @@ public class SecurityConfig {
         // ✅ 배포 도메인 추가
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
+                "https://plip-aution.vercel.app",
+                "https://www.plip.store",
                 "http://localhost:8080",
                 "https://mmuuttssaa.shop",      // ✅ 추가
                 "http://mmuuttssaa.shop"        // ✅ 추가
