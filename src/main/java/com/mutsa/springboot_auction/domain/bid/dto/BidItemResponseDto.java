@@ -18,5 +18,6 @@ public class BidItemResponseDto {
     private Integer currentPrice;
     private String imageUrl;
     private String status;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime endAt;
 }

@@ -203,7 +203,8 @@ public class BidService {
                         price,
                         imageUrl,
                         status,
-                        bid.getCreatedAt()
+                        bid.getCreatedAt(),
+                        auction.getEndAt()
                 );
                 bidItems.add(bidItem);
             }
@@ -215,6 +216,6 @@ public class BidService {
         if (auction.getImages() == null || auction.getImages().isEmpty()) {
             return null;
         }
-        return auction.getImages().get(0).getImageUrl();
+        return auction.getImages().getFirst().getImageUrl();
     }
 }
