@@ -147,7 +147,9 @@ public class BidService {
                 bid.getDepositAmount(),
                 bid.getStatus(),
                 bid.getDepositStatus(),
-                bid.getUser().getProfileImageUrl()
+                bid.getUser().getProfileImageUrl(),
+                bid.getUser().getNickname(),
+                bid.getCreatedAt()
         );
     }
 
@@ -188,7 +190,8 @@ public class BidService {
                         auctionId,
                         goodsName,
                         price,
-                        imageUrl
+                        imageUrl,
+                        bid.getCreatedAt()
                 );
                 wonItems.add(won);
             } else {
@@ -199,7 +202,8 @@ public class BidService {
                         goodsName,
                         price,
                         imageUrl,
-                        status
+                        status,
+                        bid.getCreatedAt()
                 );
                 bidItems.add(bidItem);
             }
