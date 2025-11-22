@@ -216,6 +216,6 @@ public class BidService {
         if (auction.getImages() == null || auction.getImages().isEmpty()) {
             return null;
         }
-        return auction.getImages().get(0).getImageUrl();
+        return auction.getImages().getFirst().getImageUrl();
     }
 }
