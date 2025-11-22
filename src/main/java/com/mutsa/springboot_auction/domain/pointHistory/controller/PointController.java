@@ -1,5 +1,6 @@
 package com.mutsa.springboot_auction.domain.pointHistory.controller;
 
+import com.mutsa.springboot_auction.domain.pointHistory.dto.PointChargeRequest;
 import com.mutsa.springboot_auction.domain.pointHistory.dto.TossPaymentConfirmRequest;
 import com.mutsa.springboot_auction.domain.pointHistory.dto.TossPaymentResponse;
 import com.mutsa.springboot_auction.domain.pointHistory.entity.PointHistory;
@@ -30,10 +31,10 @@ public class PointController {
     @PostMapping("/charge")
     public void chargePoint(
             @AuthenticationPrincipal CustomOAuth2User oAuth2User,
-            Map<String, Integer> request
+            PointChargeRequest request
     ) {
         User user = oAuth2User.getUser();
-        Integer amount = request.get("amount");
+        Integer amount = request.getAmount();
         pointService.chargePoint(user, amount);
     }
 

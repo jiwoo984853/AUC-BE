@@ -56,6 +56,8 @@ public class AuctionController {
         return ResponseEntity.ok(auctionService.get(auctionId));
     }
 
+
+
     @PostMapping("/auctions/test")
     public ResponseEntity<Long> postAuctionTest(@RequestParam Long userId,
                                             @Valid @RequestBody
