@@ -11,6 +11,7 @@ import com.mutsa.springboot_auction.domain.search.repository.SearchRepository;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SearchService {
 
     private final SearchRepository searchRepository;
@@ -84,6 +86,7 @@ public class SearchService {
 
     @Transactional
     public void deleteRecentSearch(Long searchId, Long userId) {
+        log.info("search Id 반환: {}", searchId);
         RecentSearch recentSearch = recentSearchRepository.findById(searchId)
                 .orElseThrow(() -> new RuntimeException("최근 검색어를 찾을 수 없습니다"));
 
