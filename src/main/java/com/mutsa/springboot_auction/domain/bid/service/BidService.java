@@ -146,7 +146,8 @@ public class BidService {
                 bid.getBidPrice(),
                 bid.getDepositAmount(),
                 bid.getStatus(),
-                bid.getDepositStatus()
+                bid.getDepositStatus(),
+                bid.getUser().getProfileImageUrl()
         );
     }
 
