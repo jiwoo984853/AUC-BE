@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.mutsa.springboot_auction.domain.pointHistory.entity.HistoryType.CHARGE;
@@ -23,9 +24,10 @@ public class PointService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void chargePoint(User user, Integer amount) {
+    public void chargePoint(User detachedUser, Integer amount) {
+        User user = userRepository.findById(detachedUser.getId())
+                        .orElseThrow(() -> new RuntimeException("유저가 없습니다"));
         user.chargePoint(amount);
-
         PointHistory history = PointHistory.builder()
                 .user(user)
                 .changeAmount(amount)
@@ -56,6 +58,7 @@ public class PointService {
         pointHistoryRepository.save(history);
     }
 
+    // 만들고 정작 거기서 새로 로직 만들었음..
     @Transactional
     public void savePurchaseHistory(User buyer, Integer amount) {
         PointHistory history = PointHistory.builder()
