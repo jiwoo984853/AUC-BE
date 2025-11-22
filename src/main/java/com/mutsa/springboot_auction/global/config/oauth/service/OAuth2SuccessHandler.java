@@ -3,7 +3,6 @@ package com.mutsa.springboot_auction.global.config.oauth.service;
 import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
-import com.mutsa.springboot_auction.domain.user.service.UserService;
 import com.mutsa.springboot_auction.global.config.jwt.TokenProvider;
 import com.mutsa.springboot_auction.global.config.jwt.domain.RefreshToken;
 import com.mutsa.springboot_auction.global.config.jwt.repository.RefreshTokenRepository;
@@ -12,10 +11,11 @@ import com.mutsa.springboot_auction.global.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -27,7 +27,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
     public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(1);
-    public static final String REDIRECT_PATH = "http://localhost:3000/auth/kakao/callback";
+    public static final String DEFAULT_REDIRECT_PATH = "https://www.plip.store";
+    public static final String CALLBACK_PATH = "/auth/kakao/callback";
 
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -43,7 +44,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         addRefreshTokenToCookie(request, response, refreshToken);
 
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
-        String targetUrl = getTargetUrl(accessToken,user.getId());
+        String targetUrl = getTargetUrl(request, accessToken, user.getId());
 
         clearAuthenticationAttributes(request, response);
 
@@ -70,13 +71,34 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
     }
 
-    private String getTargetUrl(String token,Long userId) {
+    private String getTargetUrl(HttpServletRequest request, String token, Long userId) {
         User user = userRepository.findById(userId).get();
         Boolean isFirstLogin = user.getProfileImageUrl() == null;
-        return UriComponentsBuilder.fromUriString(REDIRECT_PATH)
+        
+        String redirectBaseUrl = getRedirectBaseUrl(request);
+        String redirectPath = redirectBaseUrl + CALLBACK_PATH;
+        
+        return UriComponentsBuilder.fromUriString(redirectPath)
                 .queryParam("token", token)
-                .queryParam("isFirstLogin",isFirstLogin)
+                .queryParam("isFirstLogin", isFirstLogin)
                 .build()
                 .toUriString();
+    }
+    
+    private String getRedirectBaseUrl(HttpServletRequest request) {
+        String origin = request.getHeader("Origin");
+        if (origin != null && !origin.isEmpty()) {
+            return origin;
+        }
+        
+        String referer = request.getHeader("Referer");
+        if (referer != null && !referer.isEmpty()) {
+            try {
+                URI uri = URI.create(referer);
+                return uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
+            } catch (Exception e) { }
+        }
+        
+        return DEFAULT_REDIRECT_PATH;
     }
 }
