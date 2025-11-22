@@ -203,7 +203,8 @@ public class BidService {
                         price,
                         imageUrl,
                         status,
-                        bid.getCreatedAt()
+                        bid.getCreatedAt(),
+                        auction.getEndAt()
                 );
                 bidItems.add(bidItem);
             }
