@@ -4,6 +4,9 @@ import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
 import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
+import com.mutsa.springboot_auction.domain.bid.entity.Bid;
+import com.mutsa.springboot_auction.domain.bid.entity.BidStatus;
+import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
 import com.mutsa.springboot_auction.domain.chat.dto.ChatMessageDto;
 import com.mutsa.springboot_auction.domain.chat.dto.ChatRoomResponseDto;
 import com.mutsa.springboot_auction.domain.chat.dto.MessageResponseDto;
@@ -34,6 +37,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final BidRepository bidRepository;
 
 
     /**
@@ -185,5 +189,14 @@ public class ChatService {
         pointHistoryRepository.save(sellerHistory);
 
         auction.setPaymentStatus(PaymentStatus.COMPLETED);
+
+        List<Bid> allBids = bidRepository.findAllByAuctionOrderByCreatedAtDesc(auction);
+        for (Bid bid : allBids) {
+            if (bid.getUser().getId().equals(buyer.getId())) {
+                bid.setStatus(BidStatus.SUCCESS);
+            } else {
+                bid.setStatus(BidStatus.FAILED);
+            }
+        }
     }
 }
