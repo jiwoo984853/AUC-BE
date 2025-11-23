@@ -29,6 +29,7 @@ public class AuctionDetailResponse {
     private String manufactureYear;
     private String location;
     private Boolean hideBidPrice;
+    private UserResponse winner;
     public static AuctionDetailResponse from(Auction auction) {
         List<String> imageUrls = auction.getImages()
                 .stream()
@@ -49,7 +50,8 @@ public class AuctionDetailResponse {
                 auction.getCondition(),
                 auction.getManufactureYear(),
                 auction.getLocation(),
-                auction.getHideBidPrice()   // Auction에서는 hideBidPrice 라서 이름 맞춰야 함
+                auction.getHideBidPrice()   ,
+                UserResponse.from(auction.getWinner())
         );
     }
 
