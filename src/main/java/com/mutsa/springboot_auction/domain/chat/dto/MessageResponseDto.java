@@ -17,4 +17,5 @@ public class MessageResponseDto {
     private String messageContent;
     private LocalDateTime sendAt;
     private boolean isMyMessage; // 내가 보낸 메세지인지
+    private Boolean isRead;
 }

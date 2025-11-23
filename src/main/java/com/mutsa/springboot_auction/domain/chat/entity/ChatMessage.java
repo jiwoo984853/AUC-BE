@@ -4,13 +4,11 @@ package com.mutsa.springboot_auction.domain.chat.entity;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,4 +30,8 @@ public class ChatMessage extends BaseTimeEntity {
 
     @Column(name = "message_content")
     private String messageContent;
+
+    @Column(name = "is_read")
+    @Builder.Default
+    private Boolean isRead = false;  // 기본값: 안 읽음
 }

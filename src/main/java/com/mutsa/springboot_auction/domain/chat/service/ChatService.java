@@ -79,7 +79,7 @@ public class ChatService {
     /**
      * 채팅방 모든 메시지 조회
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public List<MessageResponseDto> getMessages(Long roomId, Long userId) {
 
         // 채팅방 찾기
@@ -94,6 +94,11 @@ public class ChatService {
 
         List<ChatMessage> messages = chatMessageRepository.findByChatRoomChatroomIdOrderByCreatedAtAsc(chatRoom.getChatroomId());
 
+        messages.stream()
+                .filter(msg -> !msg.getUser().getId().equals(userId))  // 상대방이 보낸 것만
+                .filter(msg -> !msg.getIsRead())                        // 안 읽은 것만
+                .forEach(msg -> msg.setIsRead(true));
+
         return messages.stream()
                 .map(message -> new MessageResponseDto(
                         message.getMessageId(),
@@ -101,7 +106,8 @@ public class ChatService {
                         message.getUser().getNickname(),
                         message.getMessageContent(),
                         message.getCreatedAt(),
-                        message.getUser().getId().equals(userId)
+                        message.getUser().getId().equals(userId),
+                        message.getIsRead()
                 ))
                 .collect(Collectors.toList());
     }

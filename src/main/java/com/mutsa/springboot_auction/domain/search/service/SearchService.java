@@ -213,6 +213,7 @@ public class SearchService {
         }
 
         Duration duration =  Duration.between(now, endAt);
+        log.info("현재시간: {}, 끝나는 시간:{}, 남은 시간: {}", now, endAt, duration);
 
         long days = duration.toDays();
         long hours = duration.toHours() % 24;
