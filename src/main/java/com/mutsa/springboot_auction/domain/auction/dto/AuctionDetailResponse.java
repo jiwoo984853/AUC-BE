@@ -3,7 +3,10 @@ package com.mutsa.springboot_auction.domain.auction.dto;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
 import com.mutsa.springboot_auction.domain.auction.entity.TransactionMethod;
+import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategory;
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
+import com.mutsa.springboot_auction.domain.category.dto.CategoryResponse;
+import com.mutsa.springboot_auction.domain.category.entity.Category;
 import com.mutsa.springboot_auction.domain.user.dto.UserResponse;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,11 +34,15 @@ public class AuctionDetailResponse {
     private Boolean hideBidPrice;
     private UserResponse winner;
     private int totalNumOfBid;
+    private List<CategoryResponse> categories;
     public static AuctionDetailResponse from(Auction auction) {
         List<String> imageUrls = auction.getImages()
                 .stream()
                 .map(AuctionImage::getImageUrl)
                 .toList();
+        List<AuctionCategory> auctionCategories = auction.getCategories();
+        List<CategoryResponse> categoryResponses = auctionCategories.stream().map(AuctionCategory::getCategory)
+                .map(CategoryResponse::from).toList();
 
         return new AuctionDetailResponse(
                 auction.getAuctionId(),
@@ -53,8 +60,8 @@ public class AuctionDetailResponse {
                 auction.getLocation(),
                 auction.getHideBidPrice(),
                 UserResponse.from(auction.getWinner()),
-                auction.getBids().size()
+                auction.getBids().size(),
+                categoryResponses
         );
     }
-
 }
