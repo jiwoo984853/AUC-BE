@@ -34,4 +34,5 @@ public class ChatMessage extends BaseTimeEntity {
     @Column(name = "is_read")
     @Builder.Default
     private Boolean isRead = false;  // 기본값: 안 읽음
+
 }
