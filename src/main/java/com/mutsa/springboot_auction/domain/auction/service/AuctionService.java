@@ -9,6 +9,7 @@ import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategor
 import com.mutsa.springboot_auction.domain.auctionCategory.repository.AuctionCategoryRepository;
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
 import com.mutsa.springboot_auction.domain.auctionImage.repository.AuctionImageRepository;
+import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
 import com.mutsa.springboot_auction.domain.category.entity.Category;
 import com.mutsa.springboot_auction.domain.category.repository.CategoryRepository;
 import com.mutsa.springboot_auction.domain.user.entity.User;
@@ -25,6 +26,7 @@ public class AuctionService {
     private final AuctionImageRepository auctionImageRepository;
     private final AuctionCategoryRepository auctionCategoryRepository;
     private final CategoryRepository categoryRepository;
+    private final BidRepository bidRepository;
 
     public Long post(User seller, AuctionRequest auctionRequest) {
         // 1. Auction 엔티티 생성 (아직 저장하지 않음)
@@ -65,6 +67,7 @@ public class AuctionService {
     public AuctionDetailResponse get(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Id의 경매가 존재하지 않습니다"));
-        return AuctionDetailResponse.from(auction);
+        long totalNumOfBidder = bidRepository.countUniqueBidders(auctionId);
+        return AuctionDetailResponse.from(auction,totalNumOfBidder);
     }
 }

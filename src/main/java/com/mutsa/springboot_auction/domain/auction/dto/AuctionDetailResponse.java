@@ -8,6 +8,7 @@ import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
 import com.mutsa.springboot_auction.domain.category.dto.CategoryResponse;
 import com.mutsa.springboot_auction.domain.category.entity.Category;
 import com.mutsa.springboot_auction.domain.user.dto.UserResponse;
+import com.mutsa.springboot_auction.domain.user.entity.User;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -33,9 +34,9 @@ public class AuctionDetailResponse {
     private String location;
     private Boolean hideBidPrice;
     private UserResponse winner;
-    private int totalNumOfBid;
+    private long totalNumOfBidder;
     private List<CategoryResponse> categories;
-    public static AuctionDetailResponse from(Auction auction) {
+    public static AuctionDetailResponse from(Auction auction, long totalNumOfBidder) {
         List<String> imageUrls = auction.getImages()
                 .stream()
                 .map(AuctionImage::getImageUrl)
@@ -60,7 +61,7 @@ public class AuctionDetailResponse {
                 auction.getLocation(),
                 auction.getHideBidPrice(),
                 UserResponse.from(auction.getWinner()),
-                auction.getBids().size(),
+                totalNumOfBidder,
                 categoryResponses
         );
     }

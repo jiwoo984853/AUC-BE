@@ -52,8 +52,9 @@ public class AuctionController {
 
     // 경매상세조회
     @GetMapping("/auctions/{auctionId}")
-    public ResponseEntity<AuctionDetailResponse> getAuction(@PathVariable Long auctionId) {
-        return ResponseEntity.ok(auctionService.get(auctionId));
+    public ResponseEntity<AuctionDetailResponse> getAuction(@PathVariable Long auctionId, @AuthenticationPrincipal CustomOAuth2User oAuth2User) {
+        User viewer = oAuth2User.getUser();
+        return ResponseEntity.ok(auctionService.get(auctionId,viewer));
     }
 
 
