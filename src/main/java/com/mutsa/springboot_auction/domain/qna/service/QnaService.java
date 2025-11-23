@@ -35,7 +35,7 @@ public class QnaService {
         Qna qna = Qna.builder()
                 .auction(auction)
                 .questioner(questioner)
-                .answerContent(requestDto.getQuestionContent())
+                .questionContent(requestDto.getQuestionContent())
                 .build();
 
         Qna saved = qnaRepository.save(qna);
@@ -67,11 +67,14 @@ public class QnaService {
     private QnaResponseDto toResponseDto(Qna qna) {
         Long answerUserId = null;
         String answerNickname = null;
+        String answerProfileImageUrl = null;
         String answerContent = null;
-
+       
+        
         if (qna.getAnswerer() != null) {
             answerUserId = qna.getAnswerer().getId();
             answerNickname = qna.getAnswerer().getNickname();
+            answerProfileImageUrl = qna.getAnswerer().getProfileImageUrl();
             answerContent = qna.getAnswerContent();
         }
         return new QnaResponseDto(
@@ -79,10 +82,13 @@ public class QnaService {
                 qna.getAuction().getAuctionId(),
                 qna.getQuestioner().getId(),
                 qna.getQuestioner().getNickname(),
+                qna.getQuestioner().getProfileImageUrl(),
                 qna.getQuestionContent(),
                 qna.getCreatedAt(),
+
                 answerUserId,
                 answerNickname,
+                answerProfileImageUrl,
                 answerContent,
                 qna.getAnswerAt()
         );
