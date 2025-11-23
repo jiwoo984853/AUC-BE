@@ -4,17 +4,18 @@ import com.mutsa.springboot_auction.domain.auction.dto.AuctionDetailResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionRequest;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
-import com.mutsa.springboot_auction.domain.auctionCategory.AuctionCategoryId;
 import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategory;
 import com.mutsa.springboot_auction.domain.auctionCategory.repository.AuctionCategoryRepository;
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
 import com.mutsa.springboot_auction.domain.auctionImage.repository.AuctionImageRepository;
+import com.mutsa.springboot_auction.domain.bid.entity.Bid;
 import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
 import com.mutsa.springboot_auction.domain.category.entity.Category;
 import com.mutsa.springboot_auction.domain.category.repository.CategoryRepository;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -64,10 +65,13 @@ public class AuctionService {
     }
 
 
-    public AuctionDetailResponse get(Long auctionId) {
+    public AuctionDetailResponse get(Long auctionId, User viewer) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Id의 경매가 존재하지 않습니다"));
         long totalNumOfBidder = bidRepository.countUniqueBidders(auctionId);
-        return AuctionDetailResponse.from(auction,totalNumOfBidder);
+        Optional<Bid> userBid = bidRepository.findTopByAuction_AuctionIdAndUserIdOrderByCreatedAtDesc(
+                auctionId, viewer.getId());
+        Integer myBidPrice = userBid.map(Bid::getBidPrice).orElse(null);
+        return AuctionDetailResponse.from(auction, totalNumOfBidder, myBidPrice);
     }
 }

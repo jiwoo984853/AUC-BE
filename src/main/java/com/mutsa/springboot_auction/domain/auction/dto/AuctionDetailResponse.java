@@ -36,7 +36,8 @@ public class AuctionDetailResponse {
     private UserResponse winner;
     private long totalNumOfBidder;
     private List<CategoryResponse> categories;
-    public static AuctionDetailResponse from(Auction auction, long totalNumOfBidder) {
+    private Integer myBidPrice;
+    public static AuctionDetailResponse from(Auction auction, long totalNumOfBidder, Integer myBidPrice) {
         List<String> imageUrls = auction.getImages()
                 .stream()
                 .map(AuctionImage::getImageUrl)
@@ -62,7 +63,8 @@ public class AuctionDetailResponse {
                 auction.getHideBidPrice(),
                 UserResponse.from(auction.getWinner()),
                 totalNumOfBidder,
-                categoryResponses
+                categoryResponses,
+                myBidPrice
         );
     }
 }
