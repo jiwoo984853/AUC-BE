@@ -107,7 +107,11 @@ public class BidService {
 
         List<Bid> bids = bidRepository.findAllByAuctionOrderByCreatedAtDesc(auction);
 
-        return bids.stream().map(this::mapToResponseDto).toList();
+        return bids.stream()
+                .filter(bid -> bid.getStatus() == BidStatus.PENDING ||
+                        bid.getStatus() == BidStatus.FAILED)
+                .map(this::mapToResponseDto)
+                .toList();
     }
 
 
