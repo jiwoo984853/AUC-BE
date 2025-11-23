@@ -99,6 +99,7 @@ public class ChatService {
                         message.getMessageId(),
                         message.getUser().getId(),
                         message.getUser().getNickname(),
+                        message.getUser().getProfileImageUrl(),
                         message.getMessageContent(),
                         message.getCreatedAt(),
                         message.getUser().getId().equals(userId)
