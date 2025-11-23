@@ -30,6 +30,7 @@ public class AuctionDetailResponse {
     private String location;
     private Boolean hideBidPrice;
     private UserResponse winner;
+    private int totalNumOfBid;
     public static AuctionDetailResponse from(Auction auction) {
         List<String> imageUrls = auction.getImages()
                 .stream()
@@ -50,8 +51,9 @@ public class AuctionDetailResponse {
                 auction.getCondition(),
                 auction.getManufactureYear(),
                 auction.getLocation(),
-                auction.getHideBidPrice()   ,
-                UserResponse.from(auction.getWinner())
+                auction.getHideBidPrice(),
+                UserResponse.from(auction.getWinner()),
+                auction.getBids().size()
         );
     }
 
