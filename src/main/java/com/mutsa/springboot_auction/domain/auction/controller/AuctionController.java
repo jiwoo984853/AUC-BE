@@ -3,7 +3,7 @@ package com.mutsa.springboot_auction.domain.auction.controller;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionDetailResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionSimpleResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionRequest;
-import com.mutsa.springboot_auction.domain.auction.dto.DeckResponse;
+import com.mutsa.springboot_auction.domain.auction.dto.AuctionListResponse;
 import com.mutsa.springboot_auction.domain.auction.service.AuctionService;
 import com.mutsa.springboot_auction.domain.auction.service.DeckService;
 import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
@@ -41,13 +41,13 @@ public class AuctionController {
     }
 
     @GetMapping("/auctions/deck")
-    public ResponseEntity<DeckResponse> getDeck(
+    public ResponseEntity<AuctionListResponse> getDeck(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @RequestParam(defaultValue = "10") int size
     ) {
         Long userId = customOAuth2User.getUser().getId();
         List<AuctionSimpleResponse> items = deckService.getDeck(userId, size);
-        return ResponseEntity.ok(DeckResponse.of(items));
+        return ResponseEntity.ok(AuctionListResponse.of(items));
     }
 
     // 경매상세조회
@@ -57,15 +57,20 @@ public class AuctionController {
     }
 
 
-
     @PostMapping("/auctions/test")
     public ResponseEntity<Long> postAuctionTest(@RequestParam Long userId,
-                                            @Valid @RequestBody
-                                            AuctionRequest auctionRequest) {
+                                                @Valid @RequestBody
+                                                AuctionRequest auctionRequest) {
         log.info("되는건가 {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다"));
         log.info("되는건가 {}", user);
         return ResponseEntity.ok(auctionService.post(user, auctionRequest));
+    }
+
+    @GetMapping("/auctions/my")
+    public ResponseEntity<AuctionListResponse> getMyAuctions(@AuthenticationPrincipal CustomOAuth2User oAuth2User) {
+        User viewer = oAuth2User.getUser();
+        return ResponseEntity.ok(auctionService.getMyAuctions(viewer));
     }
 }

@@ -1,7 +1,9 @@
 package com.mutsa.springboot_auction.domain.auction.service;
 
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionDetailResponse;
+import com.mutsa.springboot_auction.domain.auction.dto.AuctionListResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionRequest;
+import com.mutsa.springboot_auction.domain.auction.dto.AuctionSimpleResponse;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.auctionCategory.AuctionCategoryId;
@@ -66,5 +68,10 @@ public class AuctionService {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Id의 경매가 존재하지 않습니다"));
         return AuctionDetailResponse.from(auction);
+    }
+
+    public AuctionListResponse getMyAuctions(User viewer) {
+        return AuctionListResponse.of(auctionRepository.findBySeller(viewer).stream()
+                .map(AuctionSimpleResponse::from).toList());
     }
 }
