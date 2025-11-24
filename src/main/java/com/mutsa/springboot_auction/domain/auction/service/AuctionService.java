@@ -1,7 +1,9 @@
 package com.mutsa.springboot_auction.domain.auction.service;
 
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionDetailResponse;
+import com.mutsa.springboot_auction.domain.auction.dto.AuctionListResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionRequest;
+import com.mutsa.springboot_auction.domain.auction.dto.AuctionSimpleResponse;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategory;
@@ -73,5 +75,10 @@ public class AuctionService {
                 auctionId, viewer.getId());
         Integer myBidPrice = userBid.map(Bid::getBidPrice).orElse(null);
         return AuctionDetailResponse.from(auction, totalNumOfBidder, myBidPrice);
+    }
+
+    public AuctionListResponse getMyAuctions(User viewer) {
+        return AuctionListResponse.of(auctionRepository.findBySeller(viewer).stream()
+                .map(AuctionSimpleResponse::from).toList());
     }
 }
