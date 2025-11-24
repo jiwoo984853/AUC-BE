@@ -15,12 +15,13 @@ public class AuctionSimpleResponse {
 
     AuctionStatus status;
 
-    private AuctionSimpleResponse(Long id, String title, String imageUrl, int currentPrice, LocalDateTime endAt) {
+    private AuctionSimpleResponse(Long id, String title, String imageUrl, int currentPrice, LocalDateTime endAt, AuctionStatus status) {
         this.id = id;
         this.title = title;
         this.imageUrl = imageUrl;
         this.currentPrice = currentPrice;
         this.endAt = endAt;
+        this.status = status;
     }
 
     public static AuctionSimpleResponse from(Auction auction) {
@@ -29,7 +30,8 @@ public class AuctionSimpleResponse {
                 auction.getGoodsName(),
                 auction.getImages().get(0).getImageUrl(),
                 auction.getCurrentPrice(),
-                auction.getEndAt()
+                auction.getEndAt(),
+                auction.getStatus()
         );
     }
 }
