@@ -30,7 +30,7 @@ public class Qna extends BaseTimeEntity {
     private User questioner;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answer_id",nullable = false)
+    @JoinColumn(name = "answer_id")
     private User answerer;
 
     @Column(name = "question_content",nullable = false,length = 1000)
