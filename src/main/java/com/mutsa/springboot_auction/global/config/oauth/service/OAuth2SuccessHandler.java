@@ -16,7 +16,6 @@ import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -81,28 +80,32 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         
         String redirectBaseUrl = getRedirectBaseUrl(request);
         String redirectPath = redirectBaseUrl + CALLBACK_PATH;
-        
+        log.info("======================");
+        log.info("redirect baseUrl = {}", redirectBaseUrl);
+        log.info("======================");
+
         return UriComponentsBuilder.fromUriString(redirectPath)
                 .queryParam("token", token)
                 .queryParam("isFirstLogin", isFirstLogin)
                 .build()
                 .toUriString();
     }
-    
+
     private String getRedirectBaseUrl(HttpServletRequest request) {
-//        String origin = request.getHeader("Origin");
-//        if (origin != null && !origin.isEmpty()) {
-//            return origin;
-//        }
-//
-//        String referer = request.getHeader("Referer");
-//        if (referer != null && !referer.isEmpty()) {
-//            try {
-//                URI uri = URI.create(referer);
-//                return uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
-//            } catch (Exception e) { }
-//        }
-        
+        String origin = request.getHeader("Origin");
+        if (origin != null && !origin.isEmpty()) {
+            return origin;
+        }
+
+        String referer = request.getHeader("Referer");
+        if (referer != null && !referer.isEmpty()) {
+            try {
+                URI uri = URI.create(referer);
+                return uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
+            } catch (Exception e) {
+            }
+        }
+
         return DEFAULT_REDIRECT_PATH;
     }
 }
