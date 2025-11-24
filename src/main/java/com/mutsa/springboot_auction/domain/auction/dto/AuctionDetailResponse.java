@@ -46,6 +46,7 @@ public class AuctionDetailResponse {
         List<CategoryResponse> categoryResponses = auctionCategories.stream().map(AuctionCategory::getCategory)
                 .map(CategoryResponse::from).toList();
 
+
         return new AuctionDetailResponse(
                 auction.getAuctionId(),
                 UserResponse.from(auction.getSeller()),
