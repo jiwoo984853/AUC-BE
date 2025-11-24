@@ -46,6 +46,10 @@ public class AuctionDetailResponse {
         List<CategoryResponse> categoryResponses = auctionCategories.stream().map(AuctionCategory::getCategory)
                 .map(CategoryResponse::from).toList();
 
+        UserResponse winnerResponse = null;
+        if(auction.getWinner() != null) {
+            winnerResponse = UserResponse.from(auction.getWinner());
+        }
 
         return new AuctionDetailResponse(
                 auction.getAuctionId(),
@@ -62,7 +66,7 @@ public class AuctionDetailResponse {
                 auction.getManufactureYear(),
                 auction.getLocation(),
                 auction.getHideBidPrice(),
-                UserResponse.from(auction.getWinner()),
+                winnerResponse,
                 totalNumOfBidder,
                 categoryResponses,
                 myBidPrice
