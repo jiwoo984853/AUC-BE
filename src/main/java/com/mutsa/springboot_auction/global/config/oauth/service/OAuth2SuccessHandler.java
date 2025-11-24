@@ -90,18 +90,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
     
     private String getRedirectBaseUrl(HttpServletRequest request) {
-        String origin = request.getHeader("Origin");
-        if (origin != null && !origin.isEmpty()) {
-            return origin;
-        }
-        
-        String referer = request.getHeader("Referer");
-        if (referer != null && !referer.isEmpty()) {
-            try {
-                URI uri = URI.create(referer);
-                return uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
-            } catch (Exception e) { }
-        }
+//        String origin = request.getHeader("Origin");
+//        if (origin != null && !origin.isEmpty()) {
+//            return origin;
+//        }
+//
+//        String referer = request.getHeader("Referer");
+//        if (referer != null && !referer.isEmpty()) {
+//            try {
+//                URI uri = URI.create(referer);
+//                return uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
+//            } catch (Exception e) { }
+//        }
         
         return DEFAULT_REDIRECT_PATH;
     }
