@@ -9,13 +9,12 @@ spring:
       host: localhost
       port: 6379
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL   # ✅ MySQL 호환 모드
-    username: sa
-    password:
+    url: jdbc:mysql://localhost:3306/PLIP
+    username: root
+    password: won0862*
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create   # create-drop 대신 update 추천
+      ddl-auto: update   # create-drop 대신 update 추천
     show-sql: true
   servlet:
     multipart:

@@ -35,6 +35,7 @@ public class AuctionDetailResponse {
                 .map(AuctionImage::getImageUrl)
                 .toList();
 
+
         return new AuctionDetailResponse(
                 auction.getAuctionId(),
                 UserResponse.from(auction.getSeller()),
