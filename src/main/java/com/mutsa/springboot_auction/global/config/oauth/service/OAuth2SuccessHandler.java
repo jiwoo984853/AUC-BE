@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -47,6 +48,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
 
         log.info("token : {}", accessToken);
+        log.info("refresh = {}", refreshToken);
         String targetUrl = getTargetUrl(request, accessToken, user.getId());
 
         clearAuthenticationAttributes(request, response);
@@ -91,21 +93,28 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .toUriString();
     }
 
+    private static final Set<String> ALLOWED_REDIRECT_ORIGINS = Set.of(
+            "https://www.plip.store",
+            "http://localhost:3000"
+    );
+
     private String getRedirectBaseUrl(HttpServletRequest request) {
         String origin = request.getHeader("Origin");
-        if (origin != null && !origin.isEmpty()) {
+        if (origin != null && ALLOWED_REDIRECT_ORIGINS.contains(origin)) {
             return origin;
         }
 
         String referer = request.getHeader("Referer");
-        if (referer != null && !referer.isEmpty()) {
+        if (referer != null) {
             try {
                 URI uri = URI.create(referer);
-                return uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
-            } catch (Exception e) {
-            }
+                String ref = uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
+                if (ALLOWED_REDIRECT_ORIGINS.contains(ref)) {
+                    return ref;
+                }
+            } catch (Exception ignored) {}
         }
 
-        return DEFAULT_REDIRECT_PATH;
+        return DEFAULT_REDIRECT_PATH; // https://www.plip.store
     }
 }
