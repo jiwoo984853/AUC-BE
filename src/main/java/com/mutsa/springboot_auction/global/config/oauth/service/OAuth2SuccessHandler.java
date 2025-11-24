@@ -100,11 +100,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private String getRedirectBaseUrl(HttpServletRequest request) {
         String origin = request.getHeader("Origin");
+        log.info("origin 오류? = {}", origin);
         if (origin != null && ALLOWED_REDIRECT_ORIGINS.contains(origin)) {
+            log.info("origin 오류? = {}", origin);
             return origin;
         }
 
         String referer = request.getHeader("Referer");
+        log.info("referer 오류? ={}", referer);
         if (referer != null) {
             try {
                 URI uri = URI.create(referer);
