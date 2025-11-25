@@ -96,6 +96,37 @@ public class NotificationService {
         }
     }
 
+    public void sendNextWinnerOfferNotification(Long userId, String goodsName, Long auctionId, Integer offerPrice) {
+
+        User user = User.builder()
+                .id(userId)
+                .build();
+
+        Notification notification = Notification.builder()
+                .user(user)
+                .message(goodsName + " 경매에서 기존 낙찰자가 취소했습니다. " + offerPrice + "원에 구매하시겠습니까?")
+                .auctionId(auctionId)
+                .type(NotificationType.NEXT_WINNER_OFFER)
+                .build();
+
+        notificationRepository.save(notification);
+
+        SseEmitter emitter = emitters.get(userId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("next-winner-offer")
+                        .data(Map.of(
+                                "message", notification.getMessage(),
+                                "auctionId", auctionId,
+                                "offerPrice", offerPrice
+                        )));
+            } catch (IOException e) {
+                emitters.remove(userId);
+            }
+        }
+    }
+
     public void sendFailNotification(Long userId, String goodsName, Long auctionId) {
 
         User user = User.builder()

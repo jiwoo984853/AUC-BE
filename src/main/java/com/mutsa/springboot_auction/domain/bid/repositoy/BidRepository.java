@@ -23,6 +23,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     @Query("SELECT COUNT(DISTINCT b.user) FROM Bid b WHERE b.auction.auctionId = :auctionId")
     long countUniqueBidders(Long auctionId);
 
+    Optional<Bid> findFirstByAuction_AuctionIdAndStatusOrderByBidPriceDesc(Long auctionId, BidStatus status);
+
     long countByAuctionAndUserAndStatus(Auction auction, User user, BidStatus status);
 
     Optional<Bid> findTopByAuction_AuctionIdAndUserIdOrderByCreatedAtDesc(Long auctionId, Long userId);
