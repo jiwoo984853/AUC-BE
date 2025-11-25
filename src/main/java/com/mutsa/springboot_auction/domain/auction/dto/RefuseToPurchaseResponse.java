@@ -11,5 +11,4 @@ import lombok.NoArgsConstructor;
 @Getter
 public class RefuseToPurchaseResponse {
     private Boolean success;
-    private UserResponse nextBidder;
 }

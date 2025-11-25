@@ -7,6 +7,7 @@ import com.mutsa.springboot_auction.domain.auction.dto.AuctionSimpleResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.RefuseToPurchaseResponse;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
+import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategory;
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
@@ -18,6 +19,7 @@ import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
 import com.mutsa.springboot_auction.domain.category.entity.Category;
 import com.mutsa.springboot_auction.domain.category.repository.CategoryRepository;
 import com.mutsa.springboot_auction.domain.notification.service.NotificationService;
+import com.mutsa.springboot_auction.domain.pointHistory.service.PointService;
 import com.mutsa.springboot_auction.domain.user.dto.UserResponse;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import jakarta.transaction.Transactional;
@@ -38,6 +40,7 @@ public class AuctionService {
     private final CategoryRepository categoryRepository;
     private final BidRepository bidRepository;
     private final NotificationService notificationService;
+    private final PointService pointService;
 
     @Transactional
     public Long post(User seller, AuctionRequest auctionRequest) {
@@ -124,14 +127,11 @@ public class AuctionService {
         //bidStatus -> failed 변경, depositStatus -> Used 변경!
         bid.setStatus(BidStatus.CANCELED);
         bid.setDepositStatus(DepositStatus.USED);
+        auction.setStatus(AuctionStatus.CLOSED);
+        auction.setPaymentStatus(PaymentStatus.COMPLETED);
+        auction.getSeller().addPoint(bid.getDepositAmount());
+        pointService.saveCancelBidHistory(auction.getSeller(),bid.getDepositAmount());
 
-        Optional<Bid> firstByAuctionAuctionIdAndStatusOrderByBidPriceDesc = bidRepository.findFirstByAuction_AuctionIdAndStatusOrderByBidPriceDesc(
-                auctionId, BidStatus.FAILED);
-        if (firstByAuctionAuctionIdAndStatusOrderByBidPriceDesc.isPresent()) {
-            Bid nextBid = firstByAuctionAuctionIdAndStatusOrderByBidPriceDesc.get();
-            notificationService.sendNextWinnerOfferNotification(nextBid.getUser().getId(),auction.getGoodsName(),auctionId,nextBid.getBidPrice());
-            return new RefuseToPurchaseResponse(true, UserResponse.from(nextBid.getUser()));
-        }
-        return new RefuseToPurchaseResponse(true, null);
+        return new RefuseToPurchaseResponse(true);
     }
 }
