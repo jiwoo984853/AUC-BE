@@ -25,10 +25,14 @@ public class AuctionSimpleResponse {
     }
 
     public static AuctionSimpleResponse from(Auction auction) {
+        String thumbnailUrl = auction.getImages().isEmpty()
+                ? null
+                : auction.getImages().get(0).getImageUrl();
+
         return new AuctionSimpleResponse(
                 auction.getAuctionId(),
                 auction.getGoodsName(),
-                auction.getImages().get(0).getImageUrl(),
+                thumbnailUrl,
                 auction.getCurrentPrice(),
                 auction.getEndAt(),
                 auction.getStatus()
