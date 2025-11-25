@@ -88,7 +88,8 @@ public class SecurityConfig {
                                 "/api/search/**",
                                 "/hc",
                                 "/error",
-                                "/auctions/test"
+                                "/auctions/test",
+                                "/api/notification/**"
                         ).permitAll()
 
                         // 나머지 모든 요청은 인증 필요
