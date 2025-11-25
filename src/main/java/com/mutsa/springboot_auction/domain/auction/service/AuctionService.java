@@ -4,6 +4,7 @@ import com.mutsa.springboot_auction.domain.auction.dto.AuctionDetailResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionListResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionRequest;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionSimpleResponse;
+import com.mutsa.springboot_auction.domain.auction.dto.RefuseToPurchaseResponse;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
@@ -11,10 +12,13 @@ import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategor
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
 import com.mutsa.springboot_auction.domain.auctionImage.repository.AuctionImageRepository;
 import com.mutsa.springboot_auction.domain.bid.entity.Bid;
+import com.mutsa.springboot_auction.domain.bid.entity.BidStatus;
+import com.mutsa.springboot_auction.domain.bid.entity.DepositStatus;
 import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
 import com.mutsa.springboot_auction.domain.category.entity.Category;
 import com.mutsa.springboot_auction.domain.category.repository.CategoryRepository;
 import com.mutsa.springboot_auction.domain.notification.service.NotificationService;
+import com.mutsa.springboot_auction.domain.user.dto.UserResponse;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -35,6 +39,7 @@ public class AuctionService {
     private final BidRepository bidRepository;
     private final NotificationService notificationService;
 
+    @Transactional
     public Long post(User seller, AuctionRequest auctionRequest) {
         // 1. Auction 엔티티 생성 (아직 저장하지 않음)
         Auction auction = Auction.of(auctionRequest, seller);
@@ -102,5 +107,31 @@ public class AuctionService {
                         auction.getAuctionId());
             }
         }
+    }
+
+    @Transactional
+    public RefuseToPurchaseResponse refuseToPurchase(Long auctionId, User purchaser) {
+
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 Id의 경매가 존재하지 않습니다"));
+        if (auction.getWinner().equals(purchaser)) {
+            throw new IllegalArgumentException("최상위 입찰자가 아닙니다.");
+        }
+        //bid 엔티티 찾아!
+        Bid bid = bidRepository.findTopByAuction_AuctionIdAndUserIdOrderByCreatedAtDesc(auctionId, purchaser.getId())
+                .orElseThrow(() -> new IllegalStateException("유저의 입찰기록이 없습니다."));
+
+        //bidStatus -> failed 변경, depositStatus -> Used 변경!
+        bid.setStatus(BidStatus.CANCELED);
+        bid.setDepositStatus(DepositStatus.USED);
+
+        Optional<Bid> firstByAuctionAuctionIdAndStatusOrderByBidPriceDesc = bidRepository.findFirstByAuction_AuctionIdAndStatusOrderByBidPriceDesc(
+                auctionId, BidStatus.FAILED);
+        if (firstByAuctionAuctionIdAndStatusOrderByBidPriceDesc.isPresent()) {
+            Bid nextBid = firstByAuctionAuctionIdAndStatusOrderByBidPriceDesc.get();
+            notificationService.sendNextWinnerOfferNotification(nextBid.getUser().getId(),auction.getGoodsName(),auctionId,nextBid.getBidPrice());
+            return new RefuseToPurchaseResponse(true, UserResponse.from(nextBid.getUser()));
+        }
+        return new RefuseToPurchaseResponse(true, null);
     }
 }
