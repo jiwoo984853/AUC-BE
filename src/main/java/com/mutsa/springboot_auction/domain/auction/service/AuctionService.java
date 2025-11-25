@@ -5,6 +5,7 @@ import com.mutsa.springboot_auction.domain.auction.dto.AuctionListResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionRequest;
 import com.mutsa.springboot_auction.domain.auction.dto.AuctionSimpleResponse;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
+import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategory;
 import com.mutsa.springboot_auction.domain.auctionCategory.repository.AuctionCategoryRepository;
@@ -14,11 +15,15 @@ import com.mutsa.springboot_auction.domain.bid.entity.Bid;
 import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
 import com.mutsa.springboot_auction.domain.category.entity.Category;
 import com.mutsa.springboot_auction.domain.category.repository.CategoryRepository;
+import com.mutsa.springboot_auction.domain.notification.service.NotificationService;
 import com.mutsa.springboot_auction.domain.user.entity.User;
+import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,9 +32,9 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final AuctionImageRepository auctionImageRepository;
-    private final AuctionCategoryRepository auctionCategoryRepository;
     private final CategoryRepository categoryRepository;
     private final BidRepository bidRepository;
+    private final NotificationService notificationService;
 
     public Long post(User seller, AuctionRequest auctionRequest) {
         // 1. Auction 엔티티 생성 (아직 저장하지 않음)
@@ -80,5 +85,17 @@ public class AuctionService {
     public AuctionListResponse getMyAuctions(User viewer) {
         return AuctionListResponse.of(auctionRepository.findBySeller(viewer).stream()
                 .map(AuctionSimpleResponse::from).toList());
+    }
+
+    @Scheduled(fixedDelay = 60_000)
+    @Transactional
+    public void closeExpiredAuctions() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Auction> auctions = auctionRepository.findAuctionsToClose(now);
+
+        for (Auction auction : auctions) {
+            auction.setStatus(AuctionStatus.SOLD);
+            notificationService.sendWinNotification(auction.getWinner().getId(),auction.getGoodsName(),auction.getAuctionId(), auction.getCurrentPrice());
+        }
     }
 }
