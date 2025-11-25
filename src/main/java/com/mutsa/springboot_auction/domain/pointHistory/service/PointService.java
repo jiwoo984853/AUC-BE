@@ -36,6 +36,15 @@ public class PointService {
         pointHistoryRepository.save(history);
     }
 
+    @Transactional
+    public void saveCancelBidHistory(User user, Integer depositAmount) {
+        PointHistory history = PointHistory.builder()
+                .user(user)
+                .type(HistoryType.CANCELD_BID)
+                .changeAmount(depositAmount)
+                .build();
+        pointHistoryRepository.save(history);
+    }
     // user랑 depositAmount 받아서 입찰시 포인트 내역에 저장
     @Transactional
     public void saveDepositHistory(User user, Integer depositAmount) {
