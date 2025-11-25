@@ -8,7 +8,6 @@ import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategory;
-import com.mutsa.springboot_auction.domain.auctionCategory.repository.AuctionCategoryRepository;
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
 import com.mutsa.springboot_auction.domain.auctionImage.repository.AuctionImageRepository;
 import com.mutsa.springboot_auction.domain.bid.entity.Bid;
@@ -94,8 +93,14 @@ public class AuctionService {
         List<Auction> auctions = auctionRepository.findAuctionsToClose(now);
 
         for (Auction auction : auctions) {
-            auction.setStatus(AuctionStatus.SOLD);
-            notificationService.sendWinNotification(auction.getWinner().getId(),auction.getGoodsName(),auction.getAuctionId(), auction.getCurrentPrice());
+            if (auction.getWinner() != null) {
+                auction.setStatus(AuctionStatus.CLOSED);
+                notificationService.sendWinNotification(auction.getWinner().getId(),auction.getGoodsName(),auction.getAuctionId(), auction.getCurrentPrice());
+            } else{
+                auction.setStatus(AuctionStatus.CLOSED);
+                notificationService.sendFailNotification(auction.getSeller().getId(), auction.getGoodsName(),
+                        auction.getAuctionId());
+            }
         }
     }
 }
