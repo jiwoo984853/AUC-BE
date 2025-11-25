@@ -199,7 +199,7 @@ public class SearchService {
     private String getStatusText(AuctionStatus status) {
         return switch (status) {
             case IN_PROGRESS -> "경매중";
-            case SOLD -> "경매종료";
+            case CLOSED -> "경매종료";
             default -> status.name();
         };
     }

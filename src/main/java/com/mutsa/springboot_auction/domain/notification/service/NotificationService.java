@@ -96,6 +96,36 @@ public class NotificationService {
         }
     }
 
+    public void sendFailNotification(Long userId, String goodsName, Long auctionId) {
+
+        User user = User.builder()
+                .id(userId)
+                .build();
+
+        Notification notification = Notification.builder()
+                .user(user)
+                .message(goodsName + "의 경매가 입찰자 없이 종료되었습니다")
+                .auctionId(auctionId)
+                .type(NotificationType.FAIL) // ⚠️ enum에 FAIL 없으면 추가 필요
+                .build();
+
+        notificationRepository.save(notification);
+
+        SseEmitter emitter = emitters.get(userId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("fail") // 프론트가 받을 이벤트 이름
+                        .data(Map.of(
+                                "message", notification.getMessage(),
+                                "auctionId", auctionId
+                        )));
+            } catch (IOException e) {
+                emitters.remove(userId);
+            }
+        }
+    }
+
     @Transactional
     public List<NotificationResponse> getNotificationList(Long userId) {
         List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);

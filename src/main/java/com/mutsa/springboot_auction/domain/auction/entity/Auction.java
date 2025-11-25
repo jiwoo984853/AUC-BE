@@ -132,7 +132,7 @@ public class Auction {
 
     public AuctionStatus getStatus() {
         if (endAt.isBefore(LocalDateTime.now())) {
-            return AuctionStatus.SOLD;
+            return AuctionStatus.CLOSED;
         }
         return status;
     }

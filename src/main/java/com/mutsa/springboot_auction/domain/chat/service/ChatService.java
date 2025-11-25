@@ -49,7 +49,7 @@ public class ChatService {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new RuntimeException("경매를 찾을 수 없습니다"));
 
-        if (auction.getStatus() != AuctionStatus.SOLD) {
+        if (auction.getStatus() != AuctionStatus.CLOSED) {
             throw new RuntimeException("경매가 낙찰된 상태가 아닙니다");
         }
 
