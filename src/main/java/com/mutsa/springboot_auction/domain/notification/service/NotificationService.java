@@ -6,7 +6,8 @@ import com.mutsa.springboot_auction.domain.notification.entity.NotificationType;
 import com.mutsa.springboot_auction.domain.notification.repository.NotificationRepository;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service; 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -14,13 +15,18 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public SseEmitter subscribe(Long userId){
         SseEmitter emitter = new SseEmitter(60 * 60 * 1000L);
@@ -30,7 +36,37 @@ public class NotificationService {
         emitter.onCompletion(() -> emitters.remove(userId));
         emitter.onTimeout(() -> emitters.remove(userId));
 
+        try {
+            // 초기 연결 메시지
+            emitter.send(SseEmitter.event()
+                    .name("connect")
+                    .data(Map.of("status", "connected")));
+            
+            // Heartbeat 시작 (30초마다)
+            startHeartbeat(userId, emitter);
+            
+        } catch (IOException e) {
+            emitters.remove(userId);
+            emitter.completeWithError(e);
+        }
+
         return emitter;
+    }
+
+      private void startHeartbeat(Long userId, SseEmitter emitter) {
+        scheduler.scheduleAtFixedRate(() -> {
+            if (emitters.containsKey(userId)) {
+                try {
+                    emitter.send(SseEmitter.event()
+                            .name("heartbeat")
+                            .data("keep-alive"));
+                } catch (IOException e) {
+                    log.info("Heartbeat 전송 실패: userId={}", userId);
+                    emitters.remove(userId);
+                    emitter.completeWithError(e);
+                }
+            }
+        }, 30, 30, TimeUnit.SECONDS); // 30초마다
     }
 
     public void sendOutbidNotification(Long userId, String goodsName, Long auctionId, Integer newBidAmount) {
