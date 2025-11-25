@@ -74,7 +74,6 @@ public class SecurityConfig {
                                 "/h2-console/**",
                                 "/login/oauth2/**",
                                 "/api/auth/**",
-                                "/api/notification/stream",
                                 "/api/s3/**",          // ← 패턴 변경
                                 "/static/**",
                                 "/css/**",
@@ -88,8 +87,7 @@ public class SecurityConfig {
                                 "/api/search/**",
                                 "/hc",
                                 "/error",
-                                "/auctions/test",
-                                "/api/notification/**"
+                                "/auctions/test"
                         ).permitAll()
 
                         // 나머지 모든 요청은 인증 필요
