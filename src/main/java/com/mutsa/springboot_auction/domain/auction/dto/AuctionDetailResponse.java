@@ -24,6 +24,7 @@ public class AuctionDetailResponse {
     private String goodsName;
     private String description;
     private Integer startPrice;
+    private Integer currentPrice;
     private List<String> imageUrl;
     private AuctionStatus status;
     private TransactionMethod transactionMethod;
@@ -45,6 +46,7 @@ public class AuctionDetailResponse {
         List<AuctionCategory> auctionCategories = auction.getCategories();
         List<CategoryResponse> categoryResponses = auctionCategories.stream().map(AuctionCategory::getCategory)
                 .map(CategoryResponse::from).toList();
+        Integer currentPrice = auction.getCurrentPrice() != null ? auction.getCurrentPrice() : 0;
 
         UserResponse winnerResponse = null;
         if(auction.getWinner() != null) {
@@ -57,6 +59,7 @@ public class AuctionDetailResponse {
                 auction.getGoodsName(),
                 auction.getDescription(),
                 auction.getStartPrice(),
+                currentPrice,
                 imageUrls,
                 auction.getStatus(),
                 auction.getTransactionMethod(),
