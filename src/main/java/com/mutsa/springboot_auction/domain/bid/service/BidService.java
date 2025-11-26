@@ -185,9 +185,14 @@ public class BidService {
 
             Long winnerId = auction.getWinner() != null ? auction.getWinner().getId() : null;
             AuctionStatus auctionStatus = auction.getStatus();
+            PaymentStatus paymentStatus = auction.getPaymentStatus();
 
             boolean isEnded = auctionStatus != AuctionStatus.IN_PROGRESS;
             boolean isMineWinner = winnerId != null && winnerId.equals(userId);
+
+            if (isMineWinner && paymentStatus == PaymentStatus.COMPLETED) {
+                return;
+            }
 
             if (isEnded && isMineWinner) {
                 WonItemResponseDto won = new WonItemResponseDto(
