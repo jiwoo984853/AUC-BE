@@ -94,7 +94,7 @@ public class AuctionService {
                 .map(AuctionSimpleResponse::from).toList());
     }
 
-    @Scheduled(fixedDelay = 60_000)
+    @Scheduled(fixedDelay = 10_000)
     @Transactional
     public void closeExpiredAuctions() {
         LocalDateTime now = LocalDateTime.now();
