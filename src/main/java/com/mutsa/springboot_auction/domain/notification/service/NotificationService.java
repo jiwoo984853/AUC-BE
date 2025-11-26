@@ -53,7 +53,7 @@ public class NotificationService {
     }
 
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 10000)
     public void startHeartbeat() {
         emitters.forEach((userId, emitter) -> {
             try {
