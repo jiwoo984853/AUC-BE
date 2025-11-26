@@ -54,7 +54,7 @@ public class NotificationService {
 
 
     @Scheduled(fixedRate = 30000)
-    private void startHeartbeat() {
+    public void startHeartbeat() {
         emitters.forEach((userId, emitter) -> {
             try {
                 emitter.send(SseEmitter.event()
