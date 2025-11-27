@@ -187,3 +187,11 @@ toss:
   payments:
     secret-key: ${TOSS_SECRET_KEY}
     base-url: https://api.tosspayments.com
+
+  spring:
+    servlet:
+      multipart:
+        # 개별 파일의 최대 크기 (예: 10MB)
+        max-file-size: 10MB
+        # 요청 전체의 최대 크기 (이것이 max-file-size보다 커야 함, 예: 10MB)
+        max-request-size: 10MB
