@@ -39,7 +39,8 @@ public class User extends BaseTimeEntity implements UserDetails {
     private Integer point = 0;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Builder.Default
+    private Role role = Role.USER;
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
