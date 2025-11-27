@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +23,6 @@ public class BidResponseDto {
     private BidStatus status;
     private DepositStatus depositStatus;
     private String profileImageUrl;
+    private String nickname;
+    private LocalDateTime createAt;
 }

@@ -18,11 +18,13 @@ public class QnaResponseDto {
 
     private Long questionUserId;
     private String questionUserNickname;
+    private String questionUserProfileImageUrl;
     private String questionContent;
     private LocalDateTime questionCreatedAt;
 
     private Long answerUserId;
     private String answerUserNickname;
+    private String answerUserProfileImageUrl;
     private String answerContent;
     private LocalDateTime answerCreatedAt;
 

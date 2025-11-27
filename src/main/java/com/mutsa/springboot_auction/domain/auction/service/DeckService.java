@@ -14,11 +14,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DeckService {
     private final RedisTemplate<String, String> redisTemplate;
     private final AuctionRepository auctionRepository;
@@ -78,6 +80,9 @@ public class DeckService {
         Set<String> currentDeckSet = getCurrentDeckSet(currentDeck);
         Set<String> disliked = getDisLikeIdSet(dislikeKey);
 
+        Set<String> holdSet = redisTemplate.opsForSet().members(holdKey);
+        if (holdSet == null) holdSet = Set.of();
+
         int maxHoldToUse = 1;  // 한 번 리필할 때 hold에서 최대 1개만 쓰자 같은 느낌 (연속으로 나오는거 싫어서 일케 함)
         int pushedFromHold = refillFromHoldRandom(holdKey, deckKey, size, maxHoldToUse, disliked, currentDeckSet);
 
@@ -89,7 +94,8 @@ public class DeckService {
         LocalDateTime now = LocalDateTime.now();
         List<Auction> candidates = auctionRepository.findByEndAtAfterOrderByAuctionIdDesc(now);
 
-        List<String> toPush = filterCandidates(size, candidates, disliked, currentDeckSet);
+        List<String> toPush = filterCandidates(size, candidates, disliked, currentDeckSet,holdSet);
+        log.info("refil from db = {}", toPush.size());
 
         if (!toPush.isEmpty()) {
             redisTemplate.opsForList().rightPushAll(deckKey, toPush);
@@ -105,6 +111,7 @@ public class DeckService {
             Set<String> currentDeckSet
     ) {
         Set<String> holdSet = redisTemplate.opsForSet().members(holdKey);
+        log.info("holdSet Size = {}", holdSet.size());
         if (holdSet == null || holdSet.isEmpty()) {
             return 0;
         }
@@ -132,12 +139,13 @@ public class DeckService {
 
         // hold 풀에서 빼기 (다시 보여줬으니까)
         redisTemplate.opsForSet().remove(holdKey, toPush.toArray());
+        log.info("refil size = {}", toPush.size());
 
         return toPush.size();
     }
 
     private List<String> filterCandidates(int size, List<Auction> candidates, Set<String> disliked,
-                                          Set<String> currentDeckSet) {
+                                          Set<String> currentDeckSet, Set<String> holdSet) {
         List<String> toPush = new ArrayList<>();
 
         //disLike, 현재 덱에 있으면 안넣음
@@ -149,6 +157,7 @@ public class DeckService {
             if (currentDeckSet.contains(idStr)) {
                 continue;
             }
+            if (holdSet.contains(idStr)) continue; // 🔥 hold에 있는 애는 DB에서 뽑지 않기
             toPush.add(idStr);
             if (toPush.size() >= size) {
                 break;

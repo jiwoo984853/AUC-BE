@@ -70,6 +70,7 @@ public class TokenProvider {
         Claims claims = getClaims(token);
         Long userId = claims.get("id", Long.class);
 
+        log.info("id조회: {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

@@ -13,15 +13,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
@@ -44,6 +46,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         addRefreshTokenToCookie(request, response, refreshToken);
 
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
+
+        log.info("token : {}", accessToken);
+        log.info("refresh = {}", refreshToken);
         String targetUrl = getTargetUrl(request, accessToken, user.getId());
 
         clearAuthenticationAttributes(request, response);
@@ -77,28 +82,42 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         
         String redirectBaseUrl = getRedirectBaseUrl(request);
         String redirectPath = redirectBaseUrl + CALLBACK_PATH;
-        
+        log.info("======================");
+        log.info("redirect baseUrl = {}", redirectBaseUrl);
+        log.info("======================");
+
         return UriComponentsBuilder.fromUriString(redirectPath)
                 .queryParam("token", token)
                 .queryParam("isFirstLogin", isFirstLogin)
                 .build()
                 .toUriString();
     }
-    
+
+    private static final Set<String> ALLOWED_REDIRECT_ORIGINS = Set.of(
+            "https://www.plip.store",
+            "http://localhost:3000"
+    );
+
     private String getRedirectBaseUrl(HttpServletRequest request) {
         String origin = request.getHeader("Origin");
-        if (origin != null && !origin.isEmpty()) {
+        log.info("origin 오류? = {}", origin);
+        if (origin != null && ALLOWED_REDIRECT_ORIGINS.contains(origin)) {
+            log.info("origin 오류? = {}", origin);
             return origin;
         }
-        
+
         String referer = request.getHeader("Referer");
-        if (referer != null && !referer.isEmpty()) {
+        log.info("referer 오류? ={}", referer);
+        if (referer != null) {
             try {
                 URI uri = URI.create(referer);
-                return uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
-            } catch (Exception e) { }
+                String ref = uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
+                if (ALLOWED_REDIRECT_ORIGINS.contains(ref)) {
+                    return ref;
+                }
+            } catch (Exception ignored) {}
         }
-        
-        return DEFAULT_REDIRECT_PATH;
+
+        return DEFAULT_REDIRECT_PATH; // https://www.plip.store
     }
 }

@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeckResponse {
+public class AuctionListResponse {
     List<AuctionSimpleResponse> auctions;
 
-    public static DeckResponse of(List<AuctionSimpleResponse> auctionSimpleResponses) {
-        return new DeckResponse(auctionSimpleResponses);
+    public static AuctionListResponse of(List<AuctionSimpleResponse> auctionSimpleResponses) {
+        return new AuctionListResponse(auctionSimpleResponses);
     }
 }
