@@ -12,8 +12,14 @@ public class UserResponse {
     private Long user_id;
     private String nickname;
     private String profileImageUrl;
+    private Integer point;
 
     public static UserResponse from(User user) {
-        return new UserResponse(user.getId(), user.getNickname(), user.getProfileImageUrl());
+        return new UserResponse(
+                user.getId(),
+                user.getNickname(),
+                user.getProfileImageUrl(),
+                user.getPoint()
+        );
     }
 }
