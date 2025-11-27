@@ -3,7 +3,6 @@ package com.mutsa.springboot_auction.domain.pointHistory.entity;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -29,8 +28,12 @@ public class PointHistory {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    @CreationTimestamp
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
 
