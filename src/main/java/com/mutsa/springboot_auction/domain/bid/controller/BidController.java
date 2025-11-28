@@ -1,6 +1,7 @@
 package com.mutsa.springboot_auction.domain.bid.controller;
 
 import com.mutsa.springboot_auction.domain.bid.dto.BidCreateRequestDto;
+import com.mutsa.springboot_auction.domain.bid.dto.BidListResponseDto;
 import com.mutsa.springboot_auction.domain.bid.dto.BidResponseDto;
 import com.mutsa.springboot_auction.domain.bid.dto.MyAuctionSummaryResponseDto;
 import com.mutsa.springboot_auction.domain.bid.service.BidService;
@@ -25,9 +26,10 @@ public class BidController {
     }
 
     @GetMapping("/auctions/{auctionId}/bids")
-    public ResponseEntity<List<BidResponseDto>> getBidsByAuction(@PathVariable Long auctionId) {
+    public ResponseEntity<BidListResponseDto> getBidsByAuction(@PathVariable Long auctionId) {
         List<BidResponseDto> bids = bidService.getBidsByAuctionId(auctionId);
-        return ResponseEntity.ok(bids);
+        BidListResponseDto response = new BidListResponseDto(bids.size(), bids);
+        return ResponseEntity.ok(response);
     }
     @GetMapping("/users/{userId}/auction-summary")
     public ResponseEntity<MyAuctionSummaryResponseDto> getMyAuctionSummary(@PathVariable Long userId) {

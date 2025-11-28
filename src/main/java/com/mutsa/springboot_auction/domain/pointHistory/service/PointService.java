@@ -1,5 +1,6 @@
 package com.mutsa.springboot_auction.domain.pointHistory.service;
 
+import com.mutsa.springboot_auction.domain.pointHistory.dto.PointHistoryResponse;
 import com.mutsa.springboot_auction.domain.pointHistory.entity.HistoryType;
 import com.mutsa.springboot_auction.domain.pointHistory.entity.PointHistory;
 import com.mutsa.springboot_auction.domain.pointHistory.repository.PointHistoryRepository;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.mutsa.springboot_auction.domain.pointHistory.entity.HistoryType.CHARGE;
 
@@ -21,9 +24,10 @@ public class PointService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void chargePoint(User user, Integer amount) {
+    public void chargePoint(User detachedUser, Integer amount) {
+        User user = userRepository.findById(detachedUser.getId())
+                        .orElseThrow(() -> new RuntimeException("유저가 없습니다"));
         user.chargePoint(amount);
-
         PointHistory history = PointHistory.builder()
                 .user(user)
                 .changeAmount(amount)
@@ -32,6 +36,15 @@ public class PointService {
         pointHistoryRepository.save(history);
     }
 
+    @Transactional
+    public void saveCancelBidHistory(User user, Integer depositAmount) {
+        PointHistory history = PointHistory.builder()
+                .user(user)
+                .type(HistoryType.CANCELD_BID)
+                .changeAmount(depositAmount)
+                .build();
+        pointHistoryRepository.save(history);
+    }
     // user랑 depositAmount 받아서 입찰시 포인트 내역에 저장
     @Transactional
     public void saveDepositHistory(User user, Integer depositAmount) {
@@ -54,6 +67,7 @@ public class PointService {
         pointHistoryRepository.save(history);
     }
 
+    // 만들고 정작 거기서 새로 로직 만들었음..
     @Transactional
     public void savePurchaseHistory(User buyer, Integer amount) {
         PointHistory history = PointHistory.builder()
@@ -74,7 +88,10 @@ public class PointService {
         pointHistoryRepository.save(history);
     }
 
-    public List<PointHistory> getHistory(User user) {
-        return pointHistoryRepository.findByUserOrderByHistoryIdDesc(user);
+    public List<PointHistoryResponse> getHistory(User user) {
+        List<PointHistory> list = pointHistoryRepository.findByUserOrderByHistoryIdDesc(user);
+        return list.stream()
+                .map(PointHistoryResponse::of)
+                .collect(Collectors.toList());
     }
 }

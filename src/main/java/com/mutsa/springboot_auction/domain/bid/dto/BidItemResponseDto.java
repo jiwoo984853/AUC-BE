@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,6 @@ public class BidItemResponseDto {
     private Integer currentPrice;
     private String imageUrl;
     private String status;
+    private LocalDateTime createdAt;
+    private LocalDateTime endAt;
 }

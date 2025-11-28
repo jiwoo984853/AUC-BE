@@ -88,7 +88,6 @@ public class SecurityConfig {
                                 "/hc",
                                 "/error",
                                 "/auctions/test"
-
                         ).permitAll()
 
                         // 나머지 모든 요청은 인증 필요
@@ -164,6 +163,11 @@ public class SecurityConfig {
 
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+
+        configuration.setExposedHeaders(Arrays.asList(
+                "Content-Type",
+                "Cache-Control"
+        ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

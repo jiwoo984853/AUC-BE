@@ -9,13 +9,12 @@ spring:
       host: localhost
       port: 6379
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL   # ✅ MySQL 호환 모드
-    username: sa
-    password:
+    url: jdbc:mysql://localhost:3306/PLIP
+    username: root
+    password: won0862*
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create   # create-drop 대신 update 추천
+      ddl-auto: update   # create-drop 대신 update 추천
     show-sql: true
   servlet:
     multipart:
@@ -188,3 +187,11 @@ toss:
   payments:
     secret-key: ${TOSS_SECRET_KEY}
     base-url: https://api.tosspayments.com
+
+  spring:
+    servlet:
+      multipart:
+        # 개별 파일의 최대 크기 (예: 10MB)
+        max-file-size: 10MB
+        # 요청 전체의 최대 크기 (이것이 max-file-size보다 커야 함, 예: 10MB)
+        max-request-size: 10MB

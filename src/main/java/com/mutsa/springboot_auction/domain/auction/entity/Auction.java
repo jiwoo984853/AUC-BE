@@ -109,10 +109,12 @@ public class Auction {
         this.startAt = startAt;
         this.endAt = endAt;
         this.condition = condition;
+        this.status = AuctionStatus.IN_PROGRESS;
         this.transactionMethod = transactionMethod;
         this.manufactureYear = manufactureYear;
         this.location = location;
         this.hideBidPrice = hideBidPrice;
+        this.currentPrice = 0;
     }
 
     public static Auction of(AuctionRequest auctionRequest, User seller) {
@@ -127,6 +129,14 @@ public class Auction {
         this.categories.add(auctionCategory); // Auction 객체 내부의 리스트 관리
         auctionCategory.setAuction(this);      // AuctionCategory 객체의 FK 필드 설정
     }
+
+    public AuctionStatus getStatus() {
+        if (endAt.isBefore(LocalDateTime.now())) {
+            return AuctionStatus.CLOSED;
+        }
+        return status;
+    }
+
 }
 
 

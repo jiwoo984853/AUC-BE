@@ -112,7 +112,11 @@ public class BidService {
 
         List<Bid> bids = bidRepository.findAllByAuctionOrderByCreatedAtDesc(auction);
 
-        return bids.stream().map(this::mapToResponseDto).toList();
+        return bids.stream()
+                .filter(bid -> bid.getStatus() == BidStatus.PENDING ||
+                        bid.getStatus() == BidStatus.FAILED)
+                .map(this::mapToResponseDto)
+                .toList();
     }
 
 
@@ -152,7 +156,9 @@ public class BidService {
                 bid.getDepositAmount(),
                 bid.getStatus(),
                 bid.getDepositStatus(),
-                bid.getUser().getProfileImageUrl()
+                bid.getUser().getProfileImageUrl(),
+                bid.getUser().getNickname(),
+                bid.getCreatedAt()
         );
     }
 
@@ -184,16 +190,22 @@ public class BidService {
 
             Long winnerId = auction.getWinner() != null ? auction.getWinner().getId() : null;
             AuctionStatus auctionStatus = auction.getStatus();
+            PaymentStatus paymentStatus = auction.getPaymentStatus();
 
             boolean isEnded = auctionStatus != AuctionStatus.IN_PROGRESS;
             boolean isMineWinner = winnerId != null && winnerId.equals(userId);
+
+            if (isMineWinner && paymentStatus == PaymentStatus.COMPLETED) {
+                return;
+            }
 
             if (isEnded && isMineWinner) {
                 WonItemResponseDto won = new WonItemResponseDto(
                         auctionId,
                         goodsName,
                         price,
-                        imageUrl
+                        imageUrl,
+                        bid.getCreatedAt()
                 );
                 wonItems.add(won);
             } else {
@@ -204,7 +216,9 @@ public class BidService {
                         goodsName,
                         price,
                         imageUrl,
-                        status
+                        status,
+                        bid.getCreatedAt(),
+                        auction.getEndAt()
                 );
                 bidItems.add(bidItem);
             }
@@ -216,6 +230,6 @@ public class BidService {
         if (auction.getImages() == null || auction.getImages().isEmpty()) {
             return null;
         }
-        return auction.getImages().get(0).getImageUrl();
+        return auction.getImages().getFirst().getImageUrl();
     }
 }

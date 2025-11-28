@@ -1,5 +1,6 @@
 package com.mutsa.springboot_auction.domain.pointHistory.controller;
 
+import com.mutsa.springboot_auction.domain.pointHistory.dto.PointHistoryResponse;
 import com.mutsa.springboot_auction.domain.pointHistory.dto.TossPaymentConfirmRequest;
 import com.mutsa.springboot_auction.domain.pointHistory.dto.TossPaymentResponse;
 import com.mutsa.springboot_auction.domain.pointHistory.entity.PointHistory;
@@ -30,7 +31,7 @@ public class PointController {
     @PostMapping("/charge")
     public void chargePoint(
             @AuthenticationPrincipal CustomOAuth2User oAuth2User,
-            Map<String, Integer> request
+            @RequestBody Map<String, Integer> request
     ) {
         User user = oAuth2User.getUser();
         Integer amount = request.get("amount");
@@ -38,7 +39,7 @@ public class PointController {
     }
 
     @GetMapping("/history")
-    public List<PointHistory> getHistory(@AuthenticationPrincipal CustomOAuth2User oAuth2User) {
+    public List<PointHistoryResponse> getHistory(@AuthenticationPrincipal CustomOAuth2User oAuth2User) {
         User user = oAuth2User.getUser();
         return pointService.getHistory(user);
     }
@@ -56,13 +57,13 @@ public class PointController {
         pointService.chargePoint(user, amount);
     }
 
-    @GetMapping("/history/test")
-    public List<PointHistory> getHistory(@RequestParam Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
-
-        return pointService.getHistory(user);
-    }
+//    @GetMapping("/history/test")
+//    public List<PointHistory> getHistory(@RequestParam Long userId) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new RuntimeException("유저 없음"));
+//
+//        return pointService.getHistory(user);
+//    }
 
     /**
      * 토스페이먼츠 결제 승인 API

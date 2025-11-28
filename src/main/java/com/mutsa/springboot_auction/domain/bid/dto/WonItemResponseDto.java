@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,4 +16,5 @@ public class WonItemResponseDto {
     private String goodsName;
     private Integer finalPrice;
     private String imageUrl;
+    private LocalDateTime createAt;
 }
