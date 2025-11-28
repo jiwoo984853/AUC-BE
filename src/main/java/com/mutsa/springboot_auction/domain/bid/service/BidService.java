@@ -16,8 +16,10 @@ import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
@@ -52,8 +54,11 @@ public class BidService {
         int deposit = (int) Math.ceil(requestDto.getBidPrice() * 0.1);
 
         if (bidder.getPoint() < requestDto.getBidPrice()) {
-            throw new IllegalArgumentException("입찰에 필요한 포인트가 부족합니다. (입찰금: "
-                    + requestDto.getBidPrice() + ", 보유 포인트 : " + bidder.getPoint() + ")");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "입찰에 필요한 포인트가 부족합니다. (입찰금: "
+                            + requestDto.getBidPrice() + ", 보유 포인트 : " + bidder.getPoint() + ")"
+            );
         }
 
         if (prevTopBid != null) {
