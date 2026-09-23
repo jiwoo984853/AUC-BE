@@ -13,6 +13,7 @@ import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -45,10 +46,13 @@ public class AuctionController {
     @GetMapping("/auctions/deck")
     public ResponseEntity<AuctionListResponse> getDeck(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) List<Long> excludeIds
     ) {
         Long userId = customOAuth2User.getUser().getId();
-        List<AuctionSimpleResponse> items = deckService.getDeck(userId, size);
+        int safeSize = Math.min(Math.max(size, 1), 30);
+        Set<Long> excluded = excludeIds == null ? Set.of() : excludeIds.stream().limit(100).collect(java.util.stream.Collectors.toSet());
+        List<AuctionSimpleResponse> items = deckService.getDeck(userId, safeSize, excluded);
         return ResponseEntity.ok(AuctionListResponse.of(items));
     }
 

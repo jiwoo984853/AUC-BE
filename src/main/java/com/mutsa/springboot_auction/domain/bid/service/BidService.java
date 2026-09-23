@@ -38,11 +38,11 @@ public class BidService {
     private final NotificationService notificationService;
 
     @Transactional
-    public BidResponseDto createBid(BidCreateRequestDto requestDto) {
+    public BidResponseDto createBid(Long authenticatedUserId, BidCreateRequestDto requestDto) {
         Auction auction = auctionRepository.findById(requestDto.getAuctionId())
                 .orElseThrow(()-> new EntityNotFoundException("경매를 찾을 수 없습니다. id=" + requestDto.getAuctionId()));
-        User bidder = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(()-> new EntityNotFoundException("사용자를 찾을 수 없습니다. id=" + requestDto.getUserId()));
+        User bidder = userRepository.findById(authenticatedUserId)
+                .orElseThrow(()-> new EntityNotFoundException("사용자를 찾을 수 없습니다. id=" + authenticatedUserId));
 
         validateAuctionCanbid(auction);
 
@@ -84,7 +84,7 @@ public class BidService {
         }
 
         bidder.subtractPoint(deposit);
-        pointService.saveRefundHistory(bidder, deposit);
+        pointService.saveDepositHistory(bidder, deposit);
 
         Bid newBid = new Bid();
         newBid.setAuction(auction);

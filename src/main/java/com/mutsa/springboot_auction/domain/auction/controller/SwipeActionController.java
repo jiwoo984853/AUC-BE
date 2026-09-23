@@ -24,7 +24,8 @@ public class SwipeActionController {
 
         swipeActionService.handleAction(customOAuth2User.getUser().getId(),
                 request.getAuctionId(),
-                request.getAction());
+                request.getAction(),
+                request.getBidId());
         return ResponseEntity.ok().body(Map.of("success", true));
     }
 }

@@ -117,7 +117,8 @@ public class AuctionService {
 
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Id의 경매가 존재하지 않습니다"));
-        if (auction.getWinner().equals(purchaser)) {
+        if (auction.getWinner() == null
+                || !auction.getWinner().getId().equals(purchaser.getId())) {
             throw new IllegalArgumentException("최상위 입찰자가 아닙니다.");
         }
         //bid 엔티티 찾아!
@@ -125,7 +126,7 @@ public class AuctionService {
                 .orElseThrow(() -> new IllegalStateException("유저의 입찰기록이 없습니다."));
 
         //bidStatus -> failed 변경, depositStatus -> Used 변경!
-        bid.setStatus(BidStatus.CANCELED);
+        bid.setStatus(BidStatus.CANCELLED);
         bid.setDepositStatus(DepositStatus.USED);
         auction.setStatus(AuctionStatus.CLOSED);
         auction.setPaymentStatus(PaymentStatus.COMPLETED);

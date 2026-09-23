@@ -15,6 +15,7 @@ import java.util.Optional;
 
 public interface BidRepository extends JpaRepository<Bid, Long> {
 
+
     Optional<Bid> findTopByAuctionOrderByBidPriceDesc(Auction auction);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

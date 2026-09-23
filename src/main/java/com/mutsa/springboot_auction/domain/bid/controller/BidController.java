@@ -5,9 +5,11 @@ import com.mutsa.springboot_auction.domain.bid.dto.BidListResponseDto;
 import com.mutsa.springboot_auction.domain.bid.dto.BidResponseDto;
 import com.mutsa.springboot_auction.domain.bid.dto.MyAuctionSummaryResponseDto;
 import com.mutsa.springboot_auction.domain.bid.service.BidService;
+import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +22,9 @@ public class BidController {
     private final BidService bidService;
 
     @PostMapping("/bids")
-    public ResponseEntity<BidResponseDto> createBid(@Valid @RequestBody BidCreateRequestDto requestDto) {
-        BidResponseDto responseDto = bidService.createBid(requestDto);
+    public ResponseEntity<BidResponseDto> createBid(@AuthenticationPrincipal CustomOAuth2User currentUser,
+                                                    @Valid @RequestBody BidCreateRequestDto requestDto) {
+        BidResponseDto responseDto = bidService.createBid(currentUser.getUser().getId(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 

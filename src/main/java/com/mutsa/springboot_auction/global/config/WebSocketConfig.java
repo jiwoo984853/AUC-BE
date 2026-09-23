@@ -1,6 +1,8 @@
 package com.mutsa.springboot_auction.global.config;
 
 import org.springframework.context.annotation.Configuration;
+import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -10,7 +12,14 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocket
 @EnableWebSocketMessageBroker // 웹소켓 메세지 브로커를 활성화해준다
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    private final ChatChannelInterceptor chatChannelInterceptor;
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(chatChannelInterceptor);
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -29,7 +38,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // 웹소캣 연결 엔드포인트
         registry.addEndpoint("/ws/chat")
-                .setAllowedOriginPatterns("*")  // 모든 Origin 허용 (개발용)
+                .setAllowedOrigins(
+                        "http://localhost:3000",
+                        "http://localhost:5173",
+                        "http://localhost:8080",
+                        "https://plip-aution.vercel.app",
+                        "https://www.plip.store",
+                        "https://mmuuttssaa.shop",
+                        "http://mmuuttssaa.shop"
+                )
                 .withSockJS();
     }
 }

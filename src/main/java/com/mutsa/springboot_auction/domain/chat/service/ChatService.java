@@ -129,6 +129,8 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다"));
 
+        assertRoomParticipant(chatRoom, userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
 
@@ -141,6 +143,20 @@ public class ChatService {
         ChatMessage savedMessage = chatMessageRepository.save(message);
 
         return new ChatMessageDto(savedMessage);
+    }
+
+    @Transactional(readOnly = true)
+    public void assertRoomParticipant(Long roomId, Long userId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("채팅방에 접근할 수 없습니다"));
+        assertRoomParticipant(chatRoom, userId);
+    }
+
+    private void assertRoomParticipant(ChatRoom chatRoom, Long userId) {
+        if (!chatRoom.getBuyer().getId().equals(userId)
+                && !chatRoom.getSeller().getId().equals(userId)) {
+            throw new org.springframework.security.access.AccessDeniedException("채팅방 접근 권한이 없습니다");
+        }
     }
 
     // roomId, userId를 받아서 낙찰자가 판매자에게 포인트 송금하는 메서드

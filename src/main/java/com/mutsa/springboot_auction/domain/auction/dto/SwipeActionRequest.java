@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class SwipeActionRequest {
     private Long auctionId;
     private String action;
+    private Long bidId;
 }

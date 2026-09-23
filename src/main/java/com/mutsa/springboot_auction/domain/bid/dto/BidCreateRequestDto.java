@@ -17,9 +17,6 @@ public class BidCreateRequestDto {
     private Long auctionId;
 
     @NotNull
-    private Long userId;
-
-    @NotNull
     @Min(1)
     private Integer bidPrice;
 
