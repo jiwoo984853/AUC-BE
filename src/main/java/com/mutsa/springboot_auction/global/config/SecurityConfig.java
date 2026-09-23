@@ -150,6 +150,7 @@ public class SecurityConfig {
         // ✅ 배포 도메인 추가
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
+                "http://localhost:5173",
                 "https://plip-aution.vercel.app",
                 "https://www.plip.store",
                 "http://localhost:8080",
@@ -198,4 +199,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-

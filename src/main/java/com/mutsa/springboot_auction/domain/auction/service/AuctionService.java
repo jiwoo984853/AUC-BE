@@ -125,7 +125,7 @@ public class AuctionService {
                 .orElseThrow(() -> new IllegalStateException("유저의 입찰기록이 없습니다."));
 
         //bidStatus -> failed 변경, depositStatus -> Used 변경!
-        bid.setStatus(BidStatus.CANCELED);
+        bid.setStatus(BidStatus.CANCELLED);
         bid.setDepositStatus(DepositStatus.USED);
         auction.setStatus(AuctionStatus.CLOSED);
         auction.setPaymentStatus(PaymentStatus.COMPLETED);

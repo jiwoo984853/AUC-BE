@@ -27,25 +27,31 @@ public class DeckService {
 
     private static final int DEFAULT_DECK_REFILL_SIZE = 30;
 
-    public List<AuctionSimpleResponse> getDeck(Long userId, int size) {
+    public List<AuctionSimpleResponse> getDeck(Long userId, int size, Set<Long> excludeIds) {
         String deckKey = RedisKey.deckKey(userId);
+
+        int requestedSize = size + excludeIds.size();
 
         Long currentSize = redisTemplate.opsForList().size(deckKey);
 
         //현재 덱이 필요한 수보다 작다면 리필
-        if (currentSize == null || currentSize < size) {
-            int need = getNeed(size, currentSize);
+        if (currentSize == null || currentSize < requestedSize) {
+            int need = getNeed(requestedSize, currentSize);
             refillDeck(userId, Math.max(need, DEFAULT_DECK_REFILL_SIZE));
         }
 
         //리필한 레디스의 덱에서 size개 만큼 id를 가져옴(프론트에 전달할 id값)
-        List<String> auctionIdStrings = redisTemplate.opsForList().range(deckKey, 0, size - 1);
+        List<String> auctionIdStrings = redisTemplate.opsForList().range(deckKey, 0, requestedSize - 1);
         if (auctionIdStrings == null || auctionIdStrings.isEmpty()) {
             return List.of();
         }
 
         List<Long> auctionIds = auctionIdStrings.stream()
-                .map(Long::valueOf).toList();
+                .map(Long::valueOf)
+                .filter(id -> !excludeIds.contains(id))
+                .distinct()
+                .limit(size)
+                .toList();
 
         //id로 레포지토리에서 조회
         return getAuctionSimpleResponses(auctionIds);
@@ -94,7 +100,7 @@ public class DeckService {
         LocalDateTime now = LocalDateTime.now();
         List<Auction> candidates = auctionRepository.findByEndAtAfterOrderByAuctionIdDesc(now);
 
-        List<String> toPush = filterCandidates(size, candidates, disliked, currentDeckSet,holdSet);
+        List<String> toPush = filterCandidates(needFromDb, candidates, disliked, currentDeckSet,holdSet);
         log.info("refil from db = {}", toPush.size());
 
         if (!toPush.isEmpty()) {
@@ -111,10 +117,10 @@ public class DeckService {
             Set<String> currentDeckSet
     ) {
         Set<String> holdSet = redisTemplate.opsForSet().members(holdKey);
-        log.info("holdSet Size = {}", holdSet.size());
         if (holdSet == null || holdSet.isEmpty()) {
             return 0;
         }
+        log.info("holdSet Size = {}", holdSet.size());
 
         List<String> shuffled = new ArrayList<>(holdSet);
         Collections.shuffle(shuffled); // 랜덤 순서

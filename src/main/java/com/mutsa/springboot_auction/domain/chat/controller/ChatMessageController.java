@@ -3,11 +3,15 @@ package com.mutsa.springboot_auction.domain.chat.controller;
 
 import com.mutsa.springboot_auction.domain.chat.dto.ChatMessageDto;
 import com.mutsa.springboot_auction.domain.chat.service.ChatService;
+import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,13 +28,17 @@ public class ChatMessageController {
     @SendTo("/topic/chat/rooms/{roomId}")
     public ChatMessageDto sendMessage(
             @DestinationVariable Long roomId,
-            ChatMessageDto messageDto
+            ChatMessageDto messageDto,
+            Principal principal
     ) {
-        return chatService.saveMessage(
+        CustomOAuth2User user = (CustomOAuth2User) ((Authentication) principal).getPrincipal();
+        ChatMessageDto savedMessage = chatService.saveMessage(
                 roomId,
-                messageDto.getSenderId(),
+                user.getUser().getId(),
                 messageDto.getMessageContent()
         );
+        savedMessage.setClientMessageId(messageDto.getClientMessageId());
+        return savedMessage;
     }
 
 }

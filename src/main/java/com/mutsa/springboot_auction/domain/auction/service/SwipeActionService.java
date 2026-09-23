@@ -4,6 +4,8 @@ import com.mutsa.springboot_auction.domain.auction.entity.ItemState;
 import com.mutsa.springboot_auction.domain.auction.entity.UserAuctionState;
 import com.mutsa.springboot_auction.domain.auction.repository.UserAuctionStateRepository;
 import com.mutsa.springboot_auction.domain.auction.util.RedisKey;
+import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
+import com.mutsa.springboot_auction.domain.bid.entity.Bid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
@@ -15,16 +17,23 @@ import org.springframework.stereotype.Service;
 public class SwipeActionService {
     private final RedisTemplate<String, String> redisTemplate;
     private final UserAuctionStateRepository userAuctionStateRepository;
-    public void handleAction(Long userId, Long auctionId, String action) {
+    private final BidRepository bidRepository;
+    public void handleAction(Long userId, Long auctionId, String action, Long bidId) {
         switch(action.toUpperCase()) {
             case "DISLIKE" -> handleDisLike(userId, auctionId);
             case "HOLD" -> handleHold(userId, auctionId);
-            case "BIDDING" -> handleBidding(userId, auctionId);
+            case "BIDDING" -> handleBidding(userId, auctionId, bidId);
             default -> throw new IllegalArgumentException("Invalid action:" + action);
         }
     }
 
-    private void handleBidding(Long userId, Long auctionId) {
+    private void handleBidding(Long userId, Long auctionId, Long bidId) {
+        Bid bid = bidId == null ? null : bidRepository.findById(bidId).orElse(null);
+        if (bid == null || !bid.getAuction().getAuctionId().equals(auctionId)
+                || !bid.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("입찰이 완료된 경매만 입찰 상태로 변경할 수 있습니다");
+        }
+
         String dislikeKey = RedisKey.dislikeKey(userId); //재노출 방지
         String deckKey = RedisKey.deckKey(userId);
 

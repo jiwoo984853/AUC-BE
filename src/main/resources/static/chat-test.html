@@ -185,6 +185,11 @@
         </div>
 
         <div class="input-group">
+            <label for="accessToken">Access Token</label>
+            <input type="password" id="accessToken" placeholder="로그인한 사용자의 토큰">
+        </div>
+
+        <div class="input-group">
             <label for="userId">사용자 ID (User ID)</label>
             <input type="number" id="userId" value="1" placeholder="사용자 ID 입력">
         </div>
@@ -247,14 +252,15 @@
         const serverUrl = document.getElementById('serverUrl').value;
         const roomId = document.getElementById('roomId').value;
         const userId = document.getElementById('userId').value;
+        const accessToken = document.getElementById('accessToken').value.trim();
 
         if (!roomId) {
             alert('채팅방 ID를 입력해주세요.');
             return;
         }
 
-        if (!userId) {
-            alert('사용자 ID를 입력해주세요.');
+        if (!accessToken) {
+            alert('Access Token을 입력해주세요.');
             return;
         }
 
@@ -267,7 +273,7 @@
             console.log('STOMP: ' + str);
         };
 
-        stompClient.connect({}, function(frame) {
+        stompClient.connect({Authorization: 'Bearer ' + accessToken}, function(frame) {
             setConnected(true);
             showMessage('시스템', '✅ 서버에 연결되었습니다.', 'system');
             showMessage('시스템', `채팅방 ID: ${roomId}, 사용자 ID: ${userId}`, 'system');
@@ -305,9 +311,7 @@
             const username = document.getElementById('username').value;
 
             // 퇴장 메시지 전송
-            const userId = parseInt(document.getElementById('userId').value);
             const quitMessage = {
-                senderId: userId,
                 messageContent: username + '님이 퇴장하셨습니다.'
             };
             const sendUrl = '/app/chat/rooms/' + roomId + '/send';
@@ -324,7 +328,6 @@
 
     function sendMessage() {
         const roomId = document.getElementById('roomId').value;
-        const userId = parseInt(document.getElementById('userId').value);
         const messageContent = document.getElementById('message').value;
 
         if (!messageContent.trim()) {
@@ -333,7 +336,6 @@
         }
 
         const message = {
-            senderId: userId,
             messageContent: messageContent
         };
         // sendMessage 메서드 호출

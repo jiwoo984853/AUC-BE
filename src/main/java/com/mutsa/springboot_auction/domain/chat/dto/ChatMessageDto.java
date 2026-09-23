@@ -19,6 +19,7 @@ public class ChatMessageDto {
     private String messageContent;
     private LocalDateTime createdAt;
     private String profileImageUrl;
+    private String clientMessageId;
 
     public ChatMessageDto(ChatMessage message) {
         this.messageId = message.getMessageId();

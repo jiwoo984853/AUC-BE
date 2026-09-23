@@ -54,6 +54,9 @@ jwt:
   access-token-expiration: 3600000    # 1시간
   refresh-token-expiration: 1209600000
 
+auth:
+  refresh-cookie-secure: false
+
 toss:
   payments:
     secret-key: ${TOSS_SECRET_KEY}
@@ -125,6 +128,9 @@ toss:
 logging:
   level:
     org.hibernate.orm.jdbc.bind: trace
+
+auth:
+  refresh-cookie-secure: true
 
 ---
 # ===============================
@@ -199,3 +205,6 @@ toss:
 server:
   error:
     include-message: always
+
+auth:
+  refresh-cookie-secure: true
