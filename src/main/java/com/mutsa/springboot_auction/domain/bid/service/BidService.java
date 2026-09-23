@@ -84,7 +84,7 @@ public class BidService {
         }
 
         bidder.subtractPoint(deposit);
-        pointService.saveRefundHistory(bidder, deposit);
+        pointService.saveDepositHistory(bidder, deposit);
 
         Bid newBid = new Bid();
         newBid.setAuction(auction);

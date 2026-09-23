@@ -117,7 +117,8 @@ public class AuctionService {
 
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Id의 경매가 존재하지 않습니다"));
-        if (auction.getWinner().equals(purchaser)) {
+        if (auction.getWinner() == null
+                || !auction.getWinner().getId().equals(purchaser.getId())) {
             throw new IllegalArgumentException("최상위 입찰자가 아닙니다.");
         }
         //bid 엔티티 찾아!
