@@ -43,7 +43,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         "http://localhost:5173",
                         "http://localhost:8080",
                         "https://plip-aution.vercel.app",
-                        "https://www.plip.store",
+                        "https://auc-fe.vercel.app",
                         "https://mmuuttssaa.shop",
                         "http://mmuuttssaa.shop"
                 )
