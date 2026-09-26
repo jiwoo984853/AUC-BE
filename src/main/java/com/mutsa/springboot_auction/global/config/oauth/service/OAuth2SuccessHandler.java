@@ -30,7 +30,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
-    public static final String DEFAULT_REDIRECT_PATH = "https://www.plip.store";
+    public static final String DEFAULT_REDIRECT_PATH = "https://auc-fe.vercel.app";
     public static final String CALLBACK_PATH = "/auth/kakao/callback";
 
     private final TokenProvider tokenProvider;
@@ -98,7 +98,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
 
     private static final Set<String> ALLOWED_REDIRECT_ORIGINS = Set.of(
-            "https://www.plip.store",
+            "https://auc-fe.vercel.app",
             "http://localhost:3000",
             "http://localhost:5173"
     );
@@ -123,6 +123,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             } catch (Exception ignored) {}
         }
 
-        return DEFAULT_REDIRECT_PATH; // https://www.plip.store
+        return DEFAULT_REDIRECT_PATH; // https://auc-fe.vercel.app
     }
 }

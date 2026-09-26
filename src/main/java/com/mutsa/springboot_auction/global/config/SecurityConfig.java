@@ -152,7 +152,7 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "https://plip-aution.vercel.app",
-                "https://www.plip.store",
+                "https://auc-fe.vercel.app",
                 "http://localhost:8080",
                 "https://mmuuttssaa.shop",      // ✅ 추가
                 "http://mmuuttssaa.shop"        // ✅ 추가

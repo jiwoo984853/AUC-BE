@@ -1,0 +1,46 @@
+server:
+  forward-headers-strategy: native
+
+spring:
+  datasource:
+    url: jdbc:mysql://auc-db.cnwesuecukzn.ap-northeast-2.rds.amazonaws.com:3306/auc?sslMode=REQUIRED
+    username: aucapp
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: redis
+      port: 6379
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
+    show-sql: false
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${OAUTH_KAKAO_CLIENT_ID}
+            client-secret: ${OAUTH_KAKAO_CLIENT_SECRET}
+            redirect-uri: https://auc-fe.vercel.app/login/oauth2/code/kakao
+
+cloud:
+  aws:
+    s3:
+      bucket: auc-images-jiwoo984853-339712937188-ap-northeast-2-an
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+auth:
+  refresh-cookie-secure: true
+
+jwt:
+  secret: ${JWT_SECRET}
+
+toss:
+  payments:
+    secret-key: ${TOSS_SECRET_KEY}
+    base-url: https://api.tosspayments.com

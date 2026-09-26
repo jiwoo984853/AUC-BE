@@ -39,9 +39,6 @@ spring:
             user-name-attribute: id
 cloud:
   aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
     s3:
       bucket: ${AWS_S3_BUCKET}
     region:
@@ -110,9 +107,6 @@ spring:
 
 cloud:
   aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
     s3:
       bucket: ${AWS_S3_BUCKET}
     region:
@@ -175,9 +169,6 @@ spring:
 
 cloud:
   aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
     s3:
       bucket: ${AWS_S3_BUCKET}
     region:
