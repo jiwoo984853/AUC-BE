@@ -50,6 +50,10 @@ public class AuctionService {
         // 2. Category 조회
         List<Category> categories = categoryRepository.findAllById(auctionRequest.getCategoryIds()); // ID 타입 확인!
 
+        if (categories.size() != auctionRequest.getCategoryIds().stream().distinct().count()) {
+            throw new IllegalArgumentException("존재하지 않는 카테고리가 포함되어 있습니다.");
+        }
+
         for (Category category : categories) {
             // 3. AuctionCategory 객체 생성
             //    복합키 ID는 나중에 Hibernate가 채우므로, ID 필드는 건드리지 않습니다.
