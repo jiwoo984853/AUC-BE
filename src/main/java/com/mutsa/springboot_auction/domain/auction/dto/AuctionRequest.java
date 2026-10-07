@@ -3,6 +3,7 @@ package com.mutsa.springboot_auction.domain.auction.dto;
 import com.mutsa.springboot_auction.domain.auction.entity.TransactionMethod;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
@@ -41,9 +42,9 @@ public class AuctionRequest {
 
     private List<String> imageUrls;
 
-    private List<Long> categoryIds;
+    @NotEmpty(message = "카테고리는 최소 1개 이상 선택해야 합니다.")
+    private List<@NotNull(message = "카테고리 ID는 null일 수 없습니다.") Long> categoryIds;
 
     @NotNull(message = "입찰가 숨김 여부를 입력해주세요.")
     private Boolean hideBidPrice;
 }
-

@@ -17,7 +17,7 @@ public class CategoryService {
 
     public List<CategoryResponse> getAllCategories() {
 
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAllByOrderByCategoryIdAsc();
 
         return categories
                 .stream()
