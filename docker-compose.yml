@@ -3,7 +3,7 @@ version: '3.8'
 services:
   springboot-auction:
     container_name: springboot-auction
-    image: gtaeu/springboot-auction:latest
+    image: jiwoo9848/springboot-auction:latest
     platform: linux/amd64
     ports:
       - "8080:8080"

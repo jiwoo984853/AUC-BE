@@ -64,9 +64,8 @@ jobs:
           --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
           --parameters 'commands=[
             "cd /home/ec2-user/app",
-            "docker-compose pull",
-            "docker-compose down",
-            "docker-compose up -d"
+            "docker compose -f compose.yml pull backend",
+            "docker compose -f compose.yml up -d --no-deps backend"
           ]' \
           --region "${{ secrets.AWS_REGION }}"
 
