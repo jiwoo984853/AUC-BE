@@ -1,19 +1,15 @@
 package com.mutsa.springboot_auction.global.config.jwt.controller;
 
-import com.mutsa.springboot_auction.domain.user.entity.CustomOAuth2User;
-import com.mutsa.springboot_auction.domain.user.entity.User;
-import com.mutsa.springboot_auction.global.config.jwt.domain.RefreshToken;
 import com.mutsa.springboot_auction.global.config.jwt.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,13 +21,13 @@ public class AuthController {
     private boolean secureRefreshCookie;
 
     @PostMapping("/api/auth/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response, @AuthenticationPrincipal
-                         CustomOAuth2User customOAuth2User) {
-        Long userId = customOAuth2User.getUser().getId();
+    public String logout(HttpServletRequest request,
+                         HttpServletResponse response,
+                         @CookieValue(value = "refresh_token", required = false) String refreshToken) {
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-        if (refreshTokenRepository.findByUserId(userId).isPresent()) {
-            RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId).get();
-            refreshTokenRepository.delete(refreshToken);
+        if (refreshToken != null && !refreshToken.isBlank()) {
+            refreshTokenRepository.findByRefreshToken(refreshToken)
+                    .ifPresent(refreshTokenRepository::delete);
         }
         response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
