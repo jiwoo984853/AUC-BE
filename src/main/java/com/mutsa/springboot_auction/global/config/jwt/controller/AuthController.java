@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,7 +24,7 @@ public class AuthController {
     @Value("${auth.refresh-cookie-secure:false}")
     private boolean secureRefreshCookie;
 
-    @GetMapping("/logout")
+    @PostMapping("/api/auth/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response, @AuthenticationPrincipal
                          CustomOAuth2User customOAuth2User) {
         Long userId = customOAuth2User.getUser().getId();
