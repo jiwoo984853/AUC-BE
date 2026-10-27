@@ -18,6 +18,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 class AuctionServiceDeleteTest {
 
@@ -91,6 +95,61 @@ class AuctionServiceDeleteTest {
         service.deleteAuction(7L, seller);
 
         verify(auction).softDelete();
+        verifyNoInteractions(bids, notifications, points);
+    }
+
+    @Test
+    void deletingClosedAuctionWithoutWinnerOnlyHidesIt() {
+        AuctionRepository auctions = mock(AuctionRepository.class);
+        AuctionImageRepository images = mock(AuctionImageRepository.class);
+        CategoryRepository categories = mock(CategoryRepository.class);
+        BidRepository bids = mock(BidRepository.class);
+        NotificationService notifications = mock(NotificationService.class);
+        PointService points = mock(PointService.class);
+        AuctionService service = new AuctionService(auctions, images, categories, bids, notifications, points);
+
+        User seller = mock(User.class);
+        Auction auction = mock(Auction.class);
+        when(seller.getId()).thenReturn(1L);
+        when(auction.getSeller()).thenReturn(seller);
+        when(auction.getPaymentStatus()).thenReturn(PaymentStatus.PENDING);
+        when(auction.getStatus()).thenReturn(AuctionStatus.CLOSED);
+        when(auction.getWinner()).thenReturn(null);
+        when(auctions.findByIdForUpdate(7L)).thenReturn(Optional.of(auction));
+
+        service.deleteAuction(7L, seller);
+
+        verify(auction).softDelete();
+        verifyNoInteractions(bids, notifications, points);
+    }
+
+    @Test
+    void deletingClosedAuctionWithPendingTransactionIsRejected() {
+        AuctionRepository auctions = mock(AuctionRepository.class);
+        AuctionImageRepository images = mock(AuctionImageRepository.class);
+        CategoryRepository categories = mock(CategoryRepository.class);
+        BidRepository bids = mock(BidRepository.class);
+        NotificationService notifications = mock(NotificationService.class);
+        PointService points = mock(PointService.class);
+        AuctionService service = new AuctionService(auctions, images, categories, bids, notifications, points);
+
+        User seller = mock(User.class);
+        User winner = mock(User.class);
+        Auction auction = mock(Auction.class);
+        when(seller.getId()).thenReturn(1L);
+        when(auction.getSeller()).thenReturn(seller);
+        when(auction.getPaymentStatus()).thenReturn(PaymentStatus.PENDING);
+        when(auction.getStatus()).thenReturn(AuctionStatus.CLOSED);
+        when(auction.getWinner()).thenReturn(winner);
+        when(auctions.findByIdForUpdate(7L)).thenReturn(Optional.of(auction));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.deleteAuction(7L, seller)
+        );
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        verify(auction, never()).softDelete();
         verifyNoInteractions(bids, notifications, points);
     }
 }

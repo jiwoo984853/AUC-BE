@@ -2,6 +2,7 @@ package com.mutsa.springboot_auction.domain.auction.dto;
 
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
+import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import java.time.LocalDateTime;
 import lombok.Getter;
 
@@ -14,14 +15,20 @@ public class AuctionSimpleResponse {
     LocalDateTime endAt;
 
     AuctionStatus status;
+    PaymentStatus paymentStatus;
+    boolean hasWinner;
 
-    private AuctionSimpleResponse(Long id, String title, String imageUrl, int currentPrice, LocalDateTime endAt, AuctionStatus status) {
+    private AuctionSimpleResponse(Long id, String title, String imageUrl, int currentPrice,
+                                  LocalDateTime endAt, AuctionStatus status,
+                                  PaymentStatus paymentStatus, boolean hasWinner) {
         this.id = id;
         this.title = title;
         this.imageUrl = imageUrl;
         this.currentPrice = currentPrice;
         this.endAt = endAt;
         this.status = status;
+        this.paymentStatus = paymentStatus;
+        this.hasWinner = hasWinner;
     }
 
     public static AuctionSimpleResponse from(Auction auction) {
@@ -35,7 +42,9 @@ public class AuctionSimpleResponse {
                 thumbnailUrl,
                 auction.getCurrentPrice(),
                 auction.getEndAt(),
-                auction.getStatus()
+                auction.getStatus(),
+                auction.getPaymentStatus(),
+                auction.getWinner() != null
         );
     }
 }

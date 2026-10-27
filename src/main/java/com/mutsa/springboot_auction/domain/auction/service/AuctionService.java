@@ -120,6 +120,11 @@ public class AuctionService {
             return;
         }
 
+        if (auction.getStatus() == AuctionStatus.CLOSED && auction.getWinner() == null) {
+            auction.softDelete();
+            return;
+        }
+
         if (auction.getStatus() != AuctionStatus.IN_PROGRESS) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
