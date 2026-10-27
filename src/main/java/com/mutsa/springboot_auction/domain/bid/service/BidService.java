@@ -39,7 +39,7 @@ public class BidService {
 
     @Transactional
     public BidResponseDto createBid(Long authenticatedUserId, BidCreateRequestDto requestDto) {
-        Auction auction = auctionRepository.findById(requestDto.getAuctionId())
+        Auction auction = auctionRepository.findByIdForUpdate(requestDto.getAuctionId())
                 .orElseThrow(()-> new EntityNotFoundException("경매를 찾을 수 없습니다. id=" + requestDto.getAuctionId()));
         User bidder = userRepository.findById(authenticatedUserId)
                 .orElseThrow(()-> new EntityNotFoundException("사용자를 찾을 수 없습니다. id=" + authenticatedUserId));

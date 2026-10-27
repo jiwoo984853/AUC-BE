@@ -86,6 +86,9 @@ public class Auction {
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL)
     private List<AuctionCategory> categories = new ArrayList<>();
 
@@ -128,6 +131,10 @@ public class Auction {
     public void addCategory(AuctionCategory auctionCategory) {
         this.categories.add(auctionCategory); // Auction 객체 내부의 리스트 관리
         auctionCategory.setAuction(this);      // AuctionCategory 객체의 FK 필드 설정
+    }
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
     }
 
     public AuctionStatus getStatus() {

@@ -5,5 +5,6 @@ public enum NotificationType {
     WIN, // 낙찰
     FAIL, //입찰자 없이 종료
 
-    NEXT_WINNER_OFFER//다음 입찰자에게 알림
+    NEXT_WINNER_OFFER, //다음 입찰자에게 알림
+    AUCTION_CANCELLED // 등록자에 의한 경매 취소
 }

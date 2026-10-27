@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,6 +81,13 @@ public class AuctionController {
     public ResponseEntity<AuctionListResponse> getMyAuctions(@AuthenticationPrincipal CustomOAuth2User oAuth2User) {
         User viewer = oAuth2User.getUser();
         return ResponseEntity.ok(auctionService.getMyAuctions(viewer));
+    }
+
+    @DeleteMapping("/auctions/{auctionId}")
+    public ResponseEntity<Void> deleteAuction(@PathVariable Long auctionId,
+                                              @AuthenticationPrincipal CustomOAuth2User oAuth2User) {
+        auctionService.deleteAuction(auctionId, oAuth2User.getUser());
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/auctions/{auctionId}/purchase/refuse")

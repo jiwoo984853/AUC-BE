@@ -38,7 +38,7 @@ class BidServicePointHistoryTest {
         User seller = mock(User.class);
         when(seller.getId()).thenReturn(42L);
         when(auction.getSeller()).thenReturn(seller);
-        when(auctions.findById(7L)).thenReturn(Optional.of(auction));
+        when(auctions.findByIdForUpdate(7L)).thenReturn(Optional.of(auction));
         when(users.findById(42L)).thenReturn(Optional.of(seller));
 
         ResponseStatusException exception = assertThrows(
@@ -76,7 +76,7 @@ class BidServicePointHistoryTest {
         when(previousBidder.getId()).thenReturn(99L);
         when(previousBid.getUser()).thenReturn(previousBidder);
         when(previousBid.getDepositAmount()).thenReturn(15);
-        when(auctions.findById(7L)).thenReturn(Optional.of(auction));
+        when(auctions.findByIdForUpdate(7L)).thenReturn(Optional.of(auction));
         when(users.findById(42L)).thenReturn(Optional.of(bidder));
         when(bids.findFirstByAuctionOrderByBidPriceDesc(auction)).thenReturn(Optional.of(previousBid));
         when(bids.save(any(Bid.class))).thenAnswer(invocation -> invocation.getArgument(0));

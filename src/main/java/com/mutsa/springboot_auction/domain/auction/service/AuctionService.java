@@ -25,11 +25,15 @@ import com.mutsa.springboot_auction.domain.user.entity.User;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -94,8 +98,66 @@ public class AuctionService {
     }
 
     public AuctionListResponse getMyAuctions(User viewer) {
-        return AuctionListResponse.of(auctionRepository.findBySeller(viewer).stream()
+        return AuctionListResponse.of(auctionRepository.findBySellerAndDeletedAtIsNull(viewer).stream()
                 .map(AuctionSimpleResponse::from).toList());
+    }
+
+    @Transactional
+    public void deleteAuction(Long auctionId, User requester) {
+        Auction auction = auctionRepository.findByIdForUpdate(auctionId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "경매를 찾을 수 없습니다."));
+
+        if (!auction.getSeller().getId().equals(requester.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "경매 등록자만 삭제할 수 있습니다.");
+        }
+
+        if (auction.getDeletedAt() != null) {
+            return;
+        }
+
+        if (auction.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            auction.softDelete();
+            return;
+        }
+
+        if (auction.getStatus() != AuctionStatus.IN_PROGRESS) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "거래가 진행 중인 종료 경매는 삭제할 수 없습니다."
+            );
+        }
+
+        List<Bid> bids = bidRepository.findAllByAuctionOrderByCreatedAtDesc(auction);
+        Set<Long> notifiedUserIds = new HashSet<>();
+
+        for (Bid bid : bids) {
+            User bidder = bid.getUser();
+
+            if (bid.getDepositStatus() == DepositStatus.HELD) {
+                Integer depositAmount = bid.getDepositAmount();
+                if (depositAmount != null && depositAmount > 0) {
+                    bidder.addPoint(depositAmount);
+                    pointService.saveRefundHistory(bidder, depositAmount);
+                }
+                bid.setDepositStatus(DepositStatus.REFUNDED);
+            }
+
+            if (bid.getStatus() == BidStatus.PENDING) {
+                bid.setStatus(BidStatus.CANCELLED);
+            }
+
+            if (notifiedUserIds.add(bidder.getId())) {
+                notificationService.sendAuctionCancelledNotification(
+                        bidder.getId(),
+                        auction.getGoodsName(),
+                        auction.getAuctionId()
+                );
+            }
+        }
+
+        auction.setStatus(AuctionStatus.CANCELLED);
+        auction.setWinner(null);
+        auction.softDelete();
     }
 
     @Scheduled(fixedDelay = 60_000)

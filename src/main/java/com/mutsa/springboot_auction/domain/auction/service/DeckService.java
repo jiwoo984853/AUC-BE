@@ -59,7 +59,7 @@ public class DeckService {
 
     private List<AuctionSimpleResponse> getAuctionSimpleResponses(List<Long> auctionIds) {
         //레디스 순서 그대로 가져옴
-        List<Auction> auctions = auctionRepository.findAllById(auctionIds);
+        List<Auction> auctions = auctionRepository.findAllByAuctionIdInAndDeletedAtIsNull(auctionIds);
         Map<Long, Auction> auctionMap = auctions.stream()
                 .collect(Collectors.toMap(Auction::getAuctionId, at -> at));
 
@@ -98,7 +98,7 @@ public class DeckService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        List<Auction> candidates = auctionRepository.findByEndAtAfterOrderByAuctionIdDesc(now);
+        List<Auction> candidates = auctionRepository.findByDeletedAtIsNullAndEndAtAfterOrderByAuctionIdDesc(now);
 
         List<String> toPush = filterCandidates(needFromDb, candidates, disliked, currentDeckSet,holdSet);
         log.info("refil from db = {}", toPush.size());

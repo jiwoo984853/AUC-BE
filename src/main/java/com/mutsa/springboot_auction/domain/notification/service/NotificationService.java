@@ -191,6 +191,35 @@ public class NotificationService {
         }
     }
 
+    public void sendAuctionCancelledNotification(Long userId, String goodsName, Long auctionId) {
+        User user = User.builder()
+                .id(userId)
+                .build();
+
+        Notification notification = Notification.builder()
+                .user(user)
+                .message(goodsName + " 경매가 등록자에 의해 취소되었습니다")
+                .auctionId(auctionId)
+                .type(NotificationType.AUCTION_CANCELLED)
+                .build();
+
+        notificationRepository.save(notification);
+
+        SseEmitter emitter = emitters.get(userId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("auction-cancelled")
+                        .data(Map.of(
+                                "message", notification.getMessage(),
+                                "auctionId", auctionId
+                        )));
+            } catch (IOException e) {
+                emitters.remove(userId);
+            }
+        }
+    }
+
     @Transactional
     public List<NotificationResponse> getNotificationList(Long userId) {
         List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);

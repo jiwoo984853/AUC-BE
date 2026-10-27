@@ -27,7 +27,7 @@ class DeckServiceTest {
                 LongStream.rangeClosed(1, 13).mapToObj(String::valueOf).toList());
 
         AuctionRepository auctions = mock(AuctionRepository.class);
-        when(auctions.findAllById(any())).thenAnswer(invocation -> {
+        when(auctions.findAllByAuctionIdInAndDeletedAtIsNull(any())).thenAnswer(invocation -> {
             List<Long> ids = invocation.getArgument(0);
             return ids.stream().map(id -> {
                 Auction auction = mock(Auction.class);
