@@ -44,6 +44,8 @@ public class BidService {
         User bidder = userRepository.findById(authenticatedUserId)
                 .orElseThrow(()-> new EntityNotFoundException("사용자를 찾을 수 없습니다. id=" + authenticatedUserId));
 
+        validateBidderIsNotSeller(auction, bidder);
+
         validateAuctionCanbid(auction);
 
         validateBidPriceHigherThanCurrent(auction, requestDto.getBidPrice());
@@ -136,6 +138,16 @@ public class BidService {
 
         if (auction.getEndAt() != null && now.isAfter(ChronoLocalDate.from(auction.getEndAt()))) {
             throw new IllegalArgumentException("이미 종료된 경매입니다.");
+        }
+    }
+
+    private void validateBidderIsNotSeller(Auction auction, User bidder) {
+        User seller = auction.getSeller();
+        if (seller != null && seller.getId().equals(bidder.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "본인이 등록한 경매에는 입찰할 수 없습니다."
+            );
         }
     }
 

@@ -14,13 +14,45 @@ import com.mutsa.springboot_auction.domain.pointHistory.service.PointService;
 import com.mutsa.springboot_auction.domain.user.entity.User;
 import com.mutsa.springboot_auction.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class BidServicePointHistoryTest {
+    @Test
+    void sellerCannotBidOnOwnAuction() {
+        BidRepository bids = mock(BidRepository.class);
+        AuctionRepository auctions = mock(AuctionRepository.class);
+        UserRepository users = mock(UserRepository.class);
+        PointService points = mock(PointService.class);
+        NotificationService notifications = mock(NotificationService.class);
+        BidService service = new BidService(bids, auctions, users, points, notifications);
+
+        Auction auction = mock(Auction.class);
+        User seller = mock(User.class);
+        when(seller.getId()).thenReturn(42L);
+        when(auction.getSeller()).thenReturn(seller);
+        when(auctions.findById(7L)).thenReturn(Optional.of(auction));
+        when(users.findById(42L)).thenReturn(Optional.of(seller));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.createBid(42L, new BidCreateRequestDto(7L, 200))
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("본인이 등록한 경매에는 입찰할 수 없습니다.", exception.getReason());
+        verify(bids, never()).save(any(Bid.class));
+        verify(seller, never()).subtractPoint(anyInt());
+        verifyNoInteractions(points, notifications);
+    }
+
     @Test
     void newDepositAndPreviousBidRefundUseDifferentHistoryTypes() {
         BidRepository bids = mock(BidRepository.class);
