@@ -1,6 +1,7 @@
 package com.mutsa.springboot_auction.domain.chat.controller;
 
 import com.mutsa.springboot_auction.domain.chat.dto.ChatRoomResponseDto;
+import com.mutsa.springboot_auction.domain.chat.dto.ChatRoomListResponseDto;
 import com.mutsa.springboot_auction.domain.chat.dto.MessageResponseDto;
 import com.mutsa.springboot_auction.domain.chat.service.ChatService;
 import com.mutsa.springboot_auction.domain.user.entity.User;
@@ -17,6 +18,13 @@ import java.util.List;
 public class ChatRoomController {
 
     private final ChatService chatService;
+
+    @GetMapping("/chat/rooms")
+    public ResponseEntity<List<ChatRoomListResponseDto>> getChatRooms(
+            @AuthenticationPrincipal(expression = "user") User currentUser
+    ) {
+        return ResponseEntity.ok(chatService.getChatRooms(currentUser.getId()));
+    }
 
     // 채팅방 생성 엔드포인트
     @PostMapping("/auctions/{auctionId}/chat")

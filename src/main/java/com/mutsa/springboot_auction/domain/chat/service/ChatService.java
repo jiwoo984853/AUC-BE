@@ -9,6 +9,7 @@ import com.mutsa.springboot_auction.domain.bid.entity.BidStatus;
 import com.mutsa.springboot_auction.domain.bid.repositoy.BidRepository;
 import com.mutsa.springboot_auction.domain.chat.dto.ChatMessageDto;
 import com.mutsa.springboot_auction.domain.chat.dto.ChatRoomResponseDto;
+import com.mutsa.springboot_auction.domain.chat.dto.ChatRoomListResponseDto;
 import com.mutsa.springboot_auction.domain.chat.dto.MessageResponseDto;
 import com.mutsa.springboot_auction.domain.chat.entity.ChatMessage;
 import com.mutsa.springboot_auction.domain.chat.entity.ChatRoom;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +40,46 @@ public class ChatService {
     private final UserRepository userRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final BidRepository bidRepository;
+
+    @Transactional(readOnly = true)
+    public List<ChatRoomListResponseDto> getChatRooms(Long userId) {
+        return chatRoomRepository.findAllByParticipantId(userId).stream()
+                .map(chatRoom -> {
+                    ChatMessage latestMessage = chatMessageRepository
+                            .findTopByChatRoomChatroomIdOrderByCreatedAtDesc(chatRoom.getChatroomId())
+                            .orElse(null);
+                    Auction auction = chatRoom.getAuction();
+                    User opponent = chatRoom.getBuyer().getId().equals(userId)
+                            ? chatRoom.getSeller()
+                            : chatRoom.getBuyer();
+                    String imageUrl = auction.getImages() == null || auction.getImages().isEmpty()
+                            ? null
+                            : auction.getImages().get(0).getImageUrl();
+
+                    return ChatRoomListResponseDto.builder()
+                            .chatRoomId(chatRoom.getChatroomId())
+                            .auctionId(auction.getAuctionId())
+                            .goodsName(auction.getGoodsName())
+                            .imageUrl(imageUrl)
+                            .finalPrice(auction.getCurrentPrice())
+                            .sellerId(chatRoom.getSeller().getId())
+                            .sellerNickname(chatRoom.getSeller().getNickname())
+                            .buyerId(chatRoom.getBuyer().getId())
+                            .buyerNickname(chatRoom.getBuyer().getNickname())
+                            .opponentNickname(opponent.getNickname())
+                            .opponentProfileImageUrl(opponent.getProfileImageUrl())
+                            .lastMessage(latestMessage == null ? null : latestMessage.getMessageContent())
+                            .lastMessageAt(latestMessage == null ? chatRoom.getCreatedAt() : latestMessage.getCreatedAt())
+                            .unreadCount(chatMessageRepository
+                                    .countByChatRoomChatroomIdAndUserIdNotAndIsReadFalse(chatRoom.getChatroomId(), userId))
+                            .build();
+                })
+                .sorted(Comparator.comparing(
+                        ChatRoomListResponseDto::getLastMessageAt,
+                        Comparator.nullsLast(Comparator.reverseOrder())
+                ))
+                .toList();
+    }
 
 
     /**
