@@ -2,6 +2,7 @@ package com.mutsa.springboot_auction.domain.auction.dto;
 
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
+import com.mutsa.springboot_auction.domain.auction.entity.AuctionTimePolicy;
 import com.mutsa.springboot_auction.domain.auction.entity.TransactionMethod;
 import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategory;
 import com.mutsa.springboot_auction.domain.auctionImage.entity.AuctionImage;
@@ -61,7 +62,7 @@ public class AuctionDetailResponse {
                 auction.getStartPrice(),
                 currentPrice,
                 imageUrls,
-                auction.getStatus(),
+                AuctionTimePolicy.effectiveStatus(auction),
                 auction.getTransactionMethod(),
                 auction.getStartAt(),
                 auction.getEndAt(),

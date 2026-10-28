@@ -35,7 +35,7 @@ class OAuth2SuccessHandlerTest {
         OAuth2SuccessHandler handler = new OAuth2SuccessHandler(tokenProvider, refreshTokens, requests, users);
         ReflectionTestUtils.setField(handler, "secureRefreshCookie", true);
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addHeader("Origin", "https://www.plip.store");
+        request.addHeader("Origin", "https://auc-fe.vercel.app");
         MockHttpServletResponse response = new MockHttpServletResponse();
         var authentication = new UsernamePasswordAuthenticationToken(
                 new CustomOAuth2User(user, Map.of()), null);
@@ -48,7 +48,7 @@ class OAuth2SuccessHandlerTest {
         assertTrue(cookie.contains("HttpOnly"));
         assertTrue(cookie.contains("Secure"));
         assertTrue(cookie.contains("SameSite=None"));
-        assertTrue(response.getRedirectedUrl().startsWith("https://www.plip.store/auth/kakao/callback"));
+        assertTrue(response.getRedirectedUrl().startsWith("https://auc-fe.vercel.app/auth/kakao/callback"));
         assertFalse(response.getRedirectedUrl().contains("secret-refresh"));
         assertFalse(response.getRedirectedUrl().contains("accessToken"));
     }

@@ -2,6 +2,7 @@ package com.mutsa.springboot_auction.domain.search.service;
 
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
+import com.mutsa.springboot_auction.domain.auction.entity.AuctionTimePolicy;
 import com.mutsa.springboot_auction.domain.search.dto.RecentSearchResponse;
 import com.mutsa.springboot_auction.domain.search.dto.SearchFilterRequest;
 import com.mutsa.springboot_auction.domain.search.dto.SearchResponse;
@@ -180,7 +181,7 @@ public class SearchService {
                 ? null
                 : auction.getCategories().get(0).getCategory().getCategoryId();
 
-        String statusText = getStatusText(auction.getStatus());
+        String statusText = getStatusText(AuctionTimePolicy.effectiveStatus(auction));
         String remainingTime = calculateRemainingTime(auction.getEndAt());
 
         return SearchResponse.builder()
@@ -207,8 +208,8 @@ public class SearchService {
     private String calculateRemainingTime(LocalDateTime endAt) {
         if (endAt == null) return "시간 정보 없음";
 
-        LocalDateTime now = LocalDateTime.now();
-        if (now.isAfter(endAt)) {
+        LocalDateTime now = AuctionTimePolicy.now();
+        if (!now.isBefore(endAt)) {
             return "경매 종료";
         }
 

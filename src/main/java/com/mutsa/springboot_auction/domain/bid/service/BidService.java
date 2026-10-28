@@ -3,6 +3,7 @@ package com.mutsa.springboot_auction.domain.bid.service;
 
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
+import com.mutsa.springboot_auction.domain.auction.entity.AuctionTimePolicy;
 import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.bid.dto.*;
@@ -21,8 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -131,12 +131,12 @@ public class BidService {
             throw new IllegalArgumentException("이미 결제가 완료된 경매입니다.");
         }
 
-        LocalDate now = LocalDate.now();
-        if (auction.getStartAt() != null && now.isBefore(ChronoLocalDate.from(auction.getStartAt()))) {
+        LocalDateTime now = AuctionTimePolicy.now();
+        if (AuctionTimePolicy.hasNotStarted(auction, now)) {
             throw new IllegalArgumentException("아직 시작되지 않은 경매입니다.");
         }
 
-        if (auction.getEndAt() != null && now.isAfter(ChronoLocalDate.from(auction.getEndAt()))) {
+        if (AuctionTimePolicy.hasEnded(auction, now)) {
             throw new IllegalArgumentException("이미 종료된 경매입니다.");
         }
     }
@@ -201,7 +201,7 @@ public class BidService {
             String imageUrl = extractThumbnailUrl(auction);
 
             Long winnerId = auction.getWinner() != null ? auction.getWinner().getId() : null;
-            AuctionStatus auctionStatus = auction.getStatus();
+            AuctionStatus auctionStatus = AuctionTimePolicy.effectiveStatus(auction);
             PaymentStatus paymentStatus = auction.getPaymentStatus();
 
             boolean isEnded = auctionStatus != AuctionStatus.IN_PROGRESS;

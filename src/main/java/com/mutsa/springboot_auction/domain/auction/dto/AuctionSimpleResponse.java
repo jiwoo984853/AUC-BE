@@ -2,6 +2,7 @@ package com.mutsa.springboot_auction.domain.auction.dto;
 
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
+import com.mutsa.springboot_auction.domain.auction.entity.AuctionTimePolicy;
 import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -42,7 +43,7 @@ public class AuctionSimpleResponse {
                 thumbnailUrl,
                 auction.getCurrentPrice(),
                 auction.getEndAt(),
-                auction.getStatus(),
+                AuctionTimePolicy.effectiveStatus(auction),
                 auction.getPaymentStatus(),
                 auction.getWinner() != null
         );

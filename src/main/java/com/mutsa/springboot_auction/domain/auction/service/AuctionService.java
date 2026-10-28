@@ -7,6 +7,7 @@ import com.mutsa.springboot_auction.domain.auction.dto.AuctionSimpleResponse;
 import com.mutsa.springboot_auction.domain.auction.dto.RefuseToPurchaseResponse;
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
+import com.mutsa.springboot_auction.domain.auction.entity.AuctionTimePolicy;
 import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.auctionCategory.entity.AuctionCategory;
@@ -120,12 +121,14 @@ public class AuctionService {
             return;
         }
 
-        if (auction.getStatus() == AuctionStatus.CLOSED && auction.getWinner() == null) {
+        AuctionStatus effectiveStatus = AuctionTimePolicy.effectiveStatus(auction);
+
+        if (effectiveStatus == AuctionStatus.CLOSED && auction.getWinner() == null) {
             auction.softDelete();
             return;
         }
 
-        if (auction.getStatus() != AuctionStatus.IN_PROGRESS) {
+        if (effectiveStatus != AuctionStatus.IN_PROGRESS) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "거래가 진행 중인 종료 경매는 삭제할 수 없습니다."
@@ -168,7 +171,7 @@ public class AuctionService {
     @Scheduled(fixedDelay = 60_000)
     @Transactional
     public void closeExpiredAuctions() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = AuctionTimePolicy.now();
         List<Auction> auctions = auctionRepository.findAuctionsToClose(now);
 
         for (Auction auction : auctions) {

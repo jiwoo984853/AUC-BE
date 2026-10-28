@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -25,6 +26,34 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class BidServicePointHistoryTest {
+    @Test
+    void bidIsRejectedAfterExactAuctionEndTimeEvenBeforeSchedulerClosesIt() {
+        BidRepository bids = mock(BidRepository.class);
+        AuctionRepository auctions = mock(AuctionRepository.class);
+        UserRepository users = mock(UserRepository.class);
+        PointService points = mock(PointService.class);
+        NotificationService notifications = mock(NotificationService.class);
+        BidService service = new BidService(bids, auctions, users, points, notifications);
+
+        Auction auction = mock(Auction.class);
+        User bidder = mock(User.class);
+        when(auction.getStatus()).thenReturn(AuctionStatus.IN_PROGRESS);
+        when(auction.getPaymentStatus()).thenReturn(PaymentStatus.PENDING);
+        when(auction.getEndAt()).thenReturn(LocalDateTime.now().minusSeconds(1));
+        when(auctions.findByIdForUpdate(7L)).thenReturn(Optional.of(auction));
+        when(users.findById(42L)).thenReturn(Optional.of(bidder));
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> service.createBid(42L, new BidCreateRequestDto(7L, 200))
+        );
+
+        assertEquals("이미 종료된 경매입니다.", exception.getMessage());
+        verify(bids, never()).save(any(Bid.class));
+        verify(bidder, never()).subtractPoint(anyInt());
+        verifyNoInteractions(points, notifications);
+    }
+
     @Test
     void sellerCannotBidOnOwnAuction() {
         BidRepository bids = mock(BidRepository.class);

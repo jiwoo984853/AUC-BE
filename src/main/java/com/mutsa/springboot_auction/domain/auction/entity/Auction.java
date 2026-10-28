@@ -147,13 +147,6 @@ public class Auction {
         }
     }
 
-    public AuctionStatus getStatus() {
-        if (endAt.isBefore(LocalDateTime.now())) {
-            return AuctionStatus.CLOSED;
-        }
-        return status;
-    }
-
 }
 
 
