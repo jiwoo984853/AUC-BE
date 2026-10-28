@@ -30,6 +30,8 @@ public class DeckService {
     public List<AuctionSimpleResponse> getDeck(Long userId, int size, Set<Long> excludeIds) {
         String deckKey = RedisKey.deckKey(userId);
 
+        removeIneligibleEntries(deckKey, userId);
+
         int requestedSize = size + excludeIds.size();
 
         Long currentSize = redisTemplate.opsForList().size(deckKey);
@@ -54,12 +56,14 @@ public class DeckService {
                 .toList();
 
         //id로 레포지토리에서 조회
-        return getAuctionSimpleResponses(auctionIds);
+        return getAuctionSimpleResponses(auctionIds, userId);
     }
 
-    private List<AuctionSimpleResponse> getAuctionSimpleResponses(List<Long> auctionIds) {
+    private List<AuctionSimpleResponse> getAuctionSimpleResponses(List<Long> auctionIds, Long userId) {
         //레디스 순서 그대로 가져옴
-        List<Auction> auctions = auctionRepository.findAllByAuctionIdInAndDeletedAtIsNull(auctionIds);
+        List<Auction> auctions = auctionIds.isEmpty()
+                ? List.of()
+                : auctionRepository.findEligibleDeckAuctions(auctionIds, userId, LocalDateTime.now());
         Map<Long, Auction> auctionMap = auctions.stream()
                 .collect(Collectors.toMap(Auction::getAuctionId, at -> at));
 
@@ -90,7 +94,15 @@ public class DeckService {
         if (holdSet == null) holdSet = Set.of();
 
         int maxHoldToUse = 1;  // 한 번 리필할 때 hold에서 최대 1개만 쓰자 같은 느낌 (연속으로 나오는거 싫어서 일케 함)
-        int pushedFromHold = refillFromHoldRandom(holdKey, deckKey, size, maxHoldToUse, disliked, currentDeckSet);
+        int pushedFromHold = refillFromHoldRandom(
+                userId,
+                holdKey,
+                deckKey,
+                size,
+                maxHoldToUse,
+                disliked,
+                currentDeckSet
+        );
 
         int needFromDb = size - pushedFromHold;
         if (needFromDb <= 0) {
@@ -98,7 +110,8 @@ public class DeckService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        List<Auction> candidates = auctionRepository.findByDeletedAtIsNullAndEndAtAfterOrderByAuctionIdDesc(now);
+        List<Auction> candidates = auctionRepository
+                .findByDeletedAtIsNullAndEndAtAfterAndSellerIdNotOrderByAuctionIdDesc(now, userId);
 
         List<String> toPush = filterCandidates(needFromDb, candidates, disliked, currentDeckSet,holdSet);
         log.info("refil from db = {}", toPush.size());
@@ -109,6 +122,7 @@ public class DeckService {
     }
 
     private int refillFromHoldRandom(
+            Long userId,
             String holdKey,
             String deckKey,
             int size,
@@ -125,8 +139,16 @@ public class DeckService {
         List<String> shuffled = new ArrayList<>(holdSet);
         Collections.shuffle(shuffled); // 랜덤 순서
 
+        Set<String> eligibleIds = findEligibleIds(shuffled, userId);
+        Set<String> ineligibleIds = new HashSet<>(holdSet);
+        ineligibleIds.removeAll(eligibleIds);
+        if (!ineligibleIds.isEmpty()) {
+            redisTemplate.opsForSet().remove(holdKey, ineligibleIds.toArray());
+        }
+
         List<String> toPush = new ArrayList<>();
         for (String idStr : shuffled) {
+            if (!eligibleIds.contains(idStr)) continue;
             if (disliked.contains(idStr)) continue;
             if (currentDeckSet.contains(idStr)) continue;
 
@@ -148,6 +170,33 @@ public class DeckService {
         log.info("refil size = {}", toPush.size());
 
         return toPush.size();
+    }
+
+    private void removeIneligibleEntries(String deckKey, Long userId) {
+        List<String> currentDeck = redisTemplate.opsForList().range(deckKey, 0, -1);
+        if (currentDeck == null || currentDeck.isEmpty()) {
+            return;
+        }
+
+        Set<String> eligibleIds = findEligibleIds(currentDeck, userId);
+        currentDeck.stream()
+                .filter(id -> !eligibleIds.contains(id))
+                .distinct()
+                .forEach(id -> redisTemplate.opsForList().remove(deckKey, 0, id));
+    }
+
+    private Set<String> findEligibleIds(List<String> auctionIds, Long userId) {
+        List<Long> ids = auctionIds.stream()
+                .map(Long::valueOf)
+                .distinct()
+                .toList();
+        if (ids.isEmpty()) {
+            return Set.of();
+        }
+
+        return auctionRepository.findEligibleDeckAuctions(ids, userId, LocalDateTime.now()).stream()
+                .map(auction -> String.valueOf(auction.getAuctionId()))
+                .collect(Collectors.toSet());
     }
 
     private List<String> filterCandidates(int size, List<Auction> candidates, Set<String> disliked,

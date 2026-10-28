@@ -16,9 +16,27 @@ import org.springframework.stereotype.Repository;
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
     List<Auction> findByDeletedAtIsNullAndEndAtAfterOrderByAuctionIdDesc(LocalDateTime now);
 
+    List<Auction> findByDeletedAtIsNullAndEndAtAfterAndSellerIdNotOrderByAuctionIdDesc(
+            LocalDateTime now,
+            Long sellerId
+    );
+
     List<Auction> findBySellerAndDeletedAtIsNull(User seller);
 
     List<Auction> findAllByAuctionIdInAndDeletedAtIsNull(List<Long> auctionIds);
+
+    @Query("""
+            select a from Auction a
+            where a.auctionId in :auctionIds
+              and a.deletedAt is null
+              and a.endAt > :now
+              and a.seller.id <> :userId
+            """)
+    List<Auction> findEligibleDeckAuctions(
+            @Param("auctionIds") List<Long> auctionIds,
+            @Param("userId") Long userId,
+            @Param("now") LocalDateTime now
+    );
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select a from Auction a where a.auctionId = :auctionId")
