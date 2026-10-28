@@ -1,5 +1,6 @@
 package com.mutsa.springboot_auction.domain.chat.dto;
 
+import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class ChatRoomListResponseDto {
     private String goodsName;
     private String imageUrl;
     private Integer finalPrice;
+    private PaymentStatus paymentStatus;
     private Long sellerId;
     private String sellerNickname;
     private Long buyerId;

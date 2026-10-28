@@ -62,6 +62,7 @@ public class ChatService {
                             .goodsName(auction.getGoodsName())
                             .imageUrl(imageUrl)
                             .finalPrice(auction.getCurrentPrice())
+                            .paymentStatus(auction.getPaymentStatus())
                             .sellerId(chatRoom.getSeller().getId())
                             .sellerNickname(chatRoom.getSeller().getNickname())
                             .buyerId(chatRoom.getBuyer().getId())
@@ -119,6 +120,7 @@ public class ChatService {
                 .buyerNickname(chatRoom.getBuyer().getNickname())
                 .sellerId(chatRoom.getSeller().getId())
                 .sellerNickname(chatRoom.getSeller().getNickname())
+                .paymentStatus(chatRoom.getAuction().getPaymentStatus())
                 .build();
     }
 
@@ -210,7 +212,7 @@ public class ChatService {
         Auction auction = chatRoom.getAuction();
 
         if (auction.getPaymentStatus() == PaymentStatus.COMPLETED) {
-            throw new RuntimeException("이미 거래가 완료되었습니다");
+            return;
         }
 
         if (!chatRoom.getBuyer().getId().equals(userId)) {
