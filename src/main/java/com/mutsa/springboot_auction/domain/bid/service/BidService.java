@@ -55,11 +55,11 @@ public class BidService {
 
         int deposit = (int) Math.ceil(requestDto.getBidPrice() * 0.1);
 
-        if (bidder.getPoint() < requestDto.getBidPrice()) {
+        if (bidder.getPoint() < deposit) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "입찰에 필요한 포인트가 부족합니다. (입찰금: "
-                            + requestDto.getBidPrice() + ", 보유 포인트 : " + bidder.getPoint() + ")"
+                    "입찰 보증금에 필요한 포인트가 부족합니다. (필요 보증금: "
+                            + deposit + ", 보유 포인트: " + bidder.getPoint() + ")"
             );
         }
 

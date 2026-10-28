@@ -72,7 +72,7 @@ class BidServicePointHistoryTest {
         when(auction.getAuctionId()).thenReturn(7L);
         when(auction.getGoodsName()).thenReturn("상품");
         when(bidder.getId()).thenReturn(42L);
-        when(bidder.getPoint()).thenReturn(1_000);
+        when(bidder.getPoint()).thenReturn(20);
         when(previousBidder.getId()).thenReturn(99L);
         when(previousBid.getUser()).thenReturn(previousBidder);
         when(previousBid.getDepositAmount()).thenReturn(15);
@@ -90,5 +90,39 @@ class BidServicePointHistoryTest {
         verify(bidder).subtractPoint(20);
         verify(points).saveDepositHistory(bidder, 20);
         verify(points, never()).saveRefundHistory(bidder, 20);
+    }
+
+    @Test
+    void bidIsRejectedWhenAvailablePointsAreLessThanDeposit() {
+        BidRepository bids = mock(BidRepository.class);
+        AuctionRepository auctions = mock(AuctionRepository.class);
+        UserRepository users = mock(UserRepository.class);
+        PointService points = mock(PointService.class);
+        NotificationService notifications = mock(NotificationService.class);
+        BidService service = new BidService(bids, auctions, users, points, notifications);
+
+        Auction auction = mock(Auction.class);
+        User bidder = mock(User.class);
+        when(auction.getStatus()).thenReturn(AuctionStatus.IN_PROGRESS);
+        when(auction.getPaymentStatus()).thenReturn(PaymentStatus.PENDING);
+        when(auction.getCurrentPrice()).thenReturn(100);
+        when(bidder.getId()).thenReturn(42L);
+        when(bidder.getPoint()).thenReturn(19);
+        when(auctions.findByIdForUpdate(7L)).thenReturn(Optional.of(auction));
+        when(users.findById(42L)).thenReturn(Optional.of(bidder));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.createBid(42L, new BidCreateRequestDto(7L, 200))
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals(
+                "입찰 보증금에 필요한 포인트가 부족합니다. (필요 보증금: 20, 보유 포인트: 19)",
+                exception.getReason()
+        );
+        verify(bidder, never()).subtractPoint(anyInt());
+        verify(bids, never()).save(any(Bid.class));
+        verifyNoInteractions(points, notifications);
     }
 }
