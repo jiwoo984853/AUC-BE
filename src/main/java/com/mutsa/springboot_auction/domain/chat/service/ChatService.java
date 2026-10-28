@@ -248,7 +248,7 @@ public class ChatService {
 
         pointHistoryRepository.save(sellerHistory);
 
-        auction.setPaymentStatus(PaymentStatus.COMPLETED);
+        auction.completePayment();
 
         List<Bid> allBids = bidRepository.findAllByAuctionOrderByCreatedAtDesc(auction);
         for (Bid bid : allBids) {

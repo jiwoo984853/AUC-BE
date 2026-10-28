@@ -200,7 +200,7 @@ public class AuctionService {
         bid.setStatus(BidStatus.CANCELLED);
         bid.setDepositStatus(DepositStatus.USED);
         auction.setStatus(AuctionStatus.CLOSED);
-        auction.setPaymentStatus(PaymentStatus.COMPLETED);
+        auction.completePayment();
         auction.getSeller().addPoint(bid.getDepositAmount());
         pointService.saveCancelBidHistory(auction.getSeller(),bid.getDepositAmount());
 

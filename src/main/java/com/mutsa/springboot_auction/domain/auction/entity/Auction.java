@@ -86,6 +86,9 @@ public class Auction {
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
+    @Column(name = "payment_completed_at")
+    private LocalDateTime paymentCompletedAt;
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
@@ -135,6 +138,13 @@ public class Auction {
 
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void completePayment() {
+        this.paymentStatus = PaymentStatus.COMPLETED;
+        if (this.paymentCompletedAt == null) {
+            this.paymentCompletedAt = LocalDateTime.now();
+        }
     }
 
     public AuctionStatus getStatus() {

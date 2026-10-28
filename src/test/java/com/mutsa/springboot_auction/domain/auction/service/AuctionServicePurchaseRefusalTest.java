@@ -2,7 +2,6 @@ package com.mutsa.springboot_auction.domain.auction.service;
 
 import com.mutsa.springboot_auction.domain.auction.entity.Auction;
 import com.mutsa.springboot_auction.domain.auction.entity.AuctionStatus;
-import com.mutsa.springboot_auction.domain.auction.entity.PaymentStatus;
 import com.mutsa.springboot_auction.domain.auction.repository.AuctionRepository;
 import com.mutsa.springboot_auction.domain.auctionImage.repository.AuctionImageRepository;
 import com.mutsa.springboot_auction.domain.bid.entity.Bid;
@@ -56,7 +55,7 @@ class AuctionServicePurchaseRefusalTest {
                 () -> service.refuseToPurchase(7L, requester));
 
         verifyNoInteractions(bids, points);
-        verify(auction, never()).setPaymentStatus(any());
+        verify(auction, never()).completePayment();
     }
 
     @Test
@@ -80,7 +79,7 @@ class AuctionServicePurchaseRefusalTest {
         verify(bid).setStatus(BidStatus.CANCELLED);
         verify(bid).setDepositStatus(DepositStatus.USED);
         verify(auction).setStatus(AuctionStatus.CLOSED);
-        verify(auction).setPaymentStatus(PaymentStatus.COMPLETED);
+        verify(auction).completePayment();
         verify(seller).addPoint(500);
         verify(points).saveCancelBidHistory(seller, 500);
     }
