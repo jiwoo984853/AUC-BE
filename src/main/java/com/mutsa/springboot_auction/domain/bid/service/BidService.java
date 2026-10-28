@@ -24,9 +24,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -41,10 +44,8 @@ public class BidService {
     public BidResponseDto createBid(Long authenticatedUserId, BidCreateRequestDto requestDto) {
         Auction auction = auctionRepository.findByIdForUpdate(requestDto.getAuctionId())
                 .orElseThrow(()-> new EntityNotFoundException("경매를 찾을 수 없습니다. id=" + requestDto.getAuctionId()));
-        User bidder = userRepository.findById(authenticatedUserId)
-                .orElseThrow(()-> new EntityNotFoundException("사용자를 찾을 수 없습니다. id=" + authenticatedUserId));
 
-        validateBidderIsNotSeller(auction, bidder);
+        validateBidderIsNotSeller(auction, authenticatedUserId);
 
         validateAuctionCanbid(auction);
 
@@ -52,6 +53,10 @@ public class BidService {
 
         Bid prevTopBid = bidRepository.findFirstByAuctionOrderByBidPriceDesc(auction)
                 .orElse(null);
+        validateTopBidConsistency(auction, prevTopBid);
+
+        Map<Long, User> lockedUsers = lockBidUsers(authenticatedUserId, prevTopBid);
+        User bidder = lockedUsers.get(authenticatedUserId);
 
         int deposit = (int) Math.ceil(requestDto.getBidPrice() * 0.1);
 
@@ -64,11 +69,11 @@ public class BidService {
         }
 
         if (prevTopBid != null) {
-            User prevUser = prevTopBid.getUser();
+            User prevUser = lockedUsers.get(prevTopBid.getUser().getId());
             Integer prevDeposit = prevTopBid.getDepositAmount();
 
             if (prevDeposit == null) {
-                prevDeposit = (int) Math.ceil(requestDto.getBidPrice() * 0.1);
+                prevDeposit = (int) Math.ceil(prevTopBid.getBidPrice() * 0.1);
             }
 
             prevUser.addPoint(prevDeposit);
@@ -141,14 +146,59 @@ public class BidService {
         }
     }
 
-    private void validateBidderIsNotSeller(Auction auction, User bidder) {
+    private void validateBidderIsNotSeller(Auction auction, Long bidderId) {
         User seller = auction.getSeller();
-        if (seller != null && seller.getId().equals(bidder.getId())) {
+        if (seller != null && seller.getId().equals(bidderId)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "본인이 등록한 경매에는 입찰할 수 없습니다."
             );
         }
+    }
+
+    private Map<Long, User> lockBidUsers(Long bidderId, Bid prevTopBid) {
+        Set<Long> userIds = new HashSet<>();
+        userIds.add(bidderId);
+        if (prevTopBid != null) {
+            userIds.add(prevTopBid.getUser().getId());
+        }
+
+        Map<Long, User> lockedUsers = new HashMap<>();
+        userRepository.findAllByIdForUpdate(userIds)
+                .forEach(user -> lockedUsers.put(user.getId(), user));
+
+        if (lockedUsers.size() != userIds.size()) {
+            throw new EntityNotFoundException("입찰 관련 사용자를 찾을 수 없습니다.");
+        }
+        return lockedUsers;
+    }
+
+    private void validateTopBidConsistency(Auction auction, Bid prevTopBid) {
+        if (prevTopBid == null) {
+            if (auction.getWinner() != null) {
+                throw bidConflict();
+            }
+            return;
+        }
+
+        Long winnerId = auction.getWinner() != null ? auction.getWinner().getId() : null;
+        Long topBidderId = prevTopBid.getUser().getId();
+        boolean consistent = prevTopBid.getStatus() == BidStatus.PENDING
+                && prevTopBid.getDepositStatus() == DepositStatus.HELD
+                && prevTopBid.getBidPrice() != null
+                && prevTopBid.getBidPrice().equals(auction.getCurrentPrice())
+                && topBidderId.equals(winnerId);
+
+        if (!consistent) {
+            throw bidConflict();
+        }
+    }
+
+    private ResponseStatusException bidConflict() {
+        return new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "경매의 최고 입찰 정보가 일치하지 않습니다. 잠시 후 다시 시도해 주세요."
+        );
     }
 
     private void validateBidPriceHigherThanCurrent(Auction auction, Integer bidPrice) {

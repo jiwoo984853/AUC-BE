@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -98,15 +99,20 @@ class BidServicePointHistoryTest {
         when(auction.getStatus()).thenReturn(AuctionStatus.IN_PROGRESS);
         when(auction.getPaymentStatus()).thenReturn(PaymentStatus.PENDING);
         when(auction.getCurrentPrice()).thenReturn(100);
+        when(auction.getWinner()).thenReturn(previousBidder);
         when(auction.getAuctionId()).thenReturn(7L);
         when(auction.getGoodsName()).thenReturn("상품");
         when(bidder.getId()).thenReturn(42L);
         when(bidder.getPoint()).thenReturn(20);
         when(previousBidder.getId()).thenReturn(99L);
         when(previousBid.getUser()).thenReturn(previousBidder);
+        when(previousBid.getBidPrice()).thenReturn(100);
+        when(previousBid.getStatus()).thenReturn(BidStatus.PENDING);
+        when(previousBid.getDepositStatus()).thenReturn(DepositStatus.HELD);
         when(previousBid.getDepositAmount()).thenReturn(15);
         when(auctions.findByIdForUpdate(7L)).thenReturn(Optional.of(auction));
-        when(users.findById(42L)).thenReturn(Optional.of(bidder));
+        when(users.findAllByIdForUpdate(anyCollection()))
+                .thenReturn(List.of(bidder, previousBidder));
         when(bids.findFirstByAuctionOrderByBidPriceDesc(auction)).thenReturn(Optional.of(previousBid));
         when(bids.save(any(Bid.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -119,6 +125,43 @@ class BidServicePointHistoryTest {
         verify(bidder).subtractPoint(20);
         verify(points).saveDepositHistory(bidder, 20);
         verify(points, never()).saveRefundHistory(bidder, 20);
+        verify(auction).setCurrentPrice(200);
+        verify(auction).setWinner(bidder);
+    }
+
+    @Test
+    void inconsistentPreviousBidIsRejectedWithoutDuplicateRefund() {
+        BidRepository bids = mock(BidRepository.class);
+        AuctionRepository auctions = mock(AuctionRepository.class);
+        UserRepository users = mock(UserRepository.class);
+        PointService points = mock(PointService.class);
+        NotificationService notifications = mock(NotificationService.class);
+        BidService service = new BidService(bids, auctions, users, points, notifications);
+
+        Auction auction = mock(Auction.class);
+        User previousBidder = mock(User.class);
+        Bid previousBid = mock(Bid.class);
+        when(auction.getStatus()).thenReturn(AuctionStatus.IN_PROGRESS);
+        when(auction.getPaymentStatus()).thenReturn(PaymentStatus.PENDING);
+        when(auction.getCurrentPrice()).thenReturn(100);
+        when(auction.getWinner()).thenReturn(previousBidder);
+        when(previousBidder.getId()).thenReturn(99L);
+        when(previousBid.getUser()).thenReturn(previousBidder);
+        when(previousBid.getBidPrice()).thenReturn(100);
+        when(previousBid.getStatus()).thenReturn(BidStatus.FAILED);
+        when(previousBid.getDepositStatus()).thenReturn(DepositStatus.REFUNDED);
+        when(auctions.findByIdForUpdate(7L)).thenReturn(Optional.of(auction));
+        when(bids.findFirstByAuctionOrderByBidPriceDesc(auction)).thenReturn(Optional.of(previousBid));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.createBid(42L, new BidCreateRequestDto(7L, 200))
+        );
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        verify(previousBidder, never()).addPoint(anyInt());
+        verify(bids, never()).save(any(Bid.class));
+        verifyNoInteractions(points, notifications);
     }
 
     @Test
@@ -138,7 +181,7 @@ class BidServicePointHistoryTest {
         when(bidder.getId()).thenReturn(42L);
         when(bidder.getPoint()).thenReturn(19);
         when(auctions.findByIdForUpdate(7L)).thenReturn(Optional.of(auction));
-        when(users.findById(42L)).thenReturn(Optional.of(bidder));
+        when(users.findAllByIdForUpdate(anyCollection())).thenReturn(List.of(bidder));
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
